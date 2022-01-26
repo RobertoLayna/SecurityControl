@@ -38,6 +38,14 @@
                 <v-card>
                   <v-card-title class="subheading font-weight-bold">
                     {{ item.name }}
+                    <v-spacer />
+                    <v-btn
+                      dark
+                      color="green"
+                      @click="$router.push({name: 'AdministratorResidentialDetails', params: { id: item.id } })"
+                    >
+                      View
+                    </v-btn>
                   </v-card-title>
 
                   <v-divider />
@@ -211,7 +219,7 @@ export default {
           fat: 6.0,
           carbs: 24,
           protein: 4.0,
-          sodium: 87,
+          id: 87,
           calcium: '14%',
           iron: '1%'
         },
@@ -221,7 +229,7 @@ export default {
           fat: 9.0,
           carbs: 37,
           protein: 4.3,
-          sodium: 129,
+          id: 129,
           calcium: '8%',
           iron: '1%'
         },
@@ -231,7 +239,7 @@ export default {
           fat: 16.0,
           carbs: 23,
           protein: 6.0,
-          sodium: 337,
+          id: 337,
           calcium: '6%',
           iron: '7%'
         },
@@ -241,7 +249,7 @@ export default {
           fat: 3.7,
           carbs: 67,
           protein: 4.3,
-          sodium: 413,
+          id: 413,
           calcium: '3%',
           iron: '8%'
         }

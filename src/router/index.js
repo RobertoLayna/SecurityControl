@@ -48,9 +48,14 @@ const routes = [
     component: () => import('../views/Administrator.vue'),
     children: [
       {
-        path: 'residential',
-        name: 'AdministratorResidential',
-        component: () => import('../components/administrator/Residential.vue')
+        path: 'residentials',
+        name: 'AdministratorResidentials',
+        component: () => import('../components/administrator/Residentials.vue')
+      },
+      {
+        path: 'residential/:id',
+        name: 'AdministratorResidentialDetails',
+        component: () => import('../components/administrator/Residentials.vue')
       },
       {
         path: 'securityStaff',

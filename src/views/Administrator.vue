@@ -24,7 +24,7 @@
           v-model="group"
           active-class="black--text text--accent-4"
         >
-          <v-list-item @click="$router.push({name: 'AdministratorResidential'})">
+          <v-list-item @click="$router.push({name: 'AdministratorResidentials'})">
             <v-list-item-icon>
               <v-icon>mdi-home-group</v-icon>
             </v-list-item-icon>
