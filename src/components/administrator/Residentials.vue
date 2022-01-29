@@ -3,7 +3,7 @@
     <v-col cols="12">
       <v-sheet class="ma-3">
         <v-data-iterator
-          :items="items"
+          :items="residentials"
           :items-per-page.sync="itemsPerPage"
         >
           <template v-slot:header>
@@ -26,23 +26,25 @@
           </template>
 
           <template v-slot:default="props">
-            <v-row>
+            <v-row no-gutters>
               <v-col
                 v-for="item in props.items"
                 :key="item.name"
                 cols="12"
-                sm="6"
-                md="4"
-                lg="3"
               >
                 <v-card>
                   <v-card-title class="subheading font-weight-bold">
-                    {{ item.name }}
+                    {{ item.residential_name }}
                     <v-spacer />
                     <v-btn
                       dark
                       color="green"
-                      @click="$router.push({name: 'AdministratorResidentialDetails', params: { id: item.id } })"
+                      @click="
+                        $router.push({
+                          name: 'AdministratorResidentialDetails',
+                          params: { id: item.residential_id, residential: item }
+                        })
+                      "
                     >
                       View
                     </v-btn>
@@ -50,14 +52,14 @@
 
                   <v-divider />
 
-                  <v-list dense>
+                  <!--v-list dense>
                     <v-list-item>
                       <v-list-item-content>Residents:</v-list-item-content>
                       <v-list-item-content class="align-end">
                         {{ item.calories }}
                       </v-list-item-content>
                     </v-list-item>
-                  </v-list>
+                  </v-list-->
                 </v-card>
               </v-col>
             </v-row>
@@ -102,7 +104,7 @@
             <v-btn
               dark
               text
-              @click="dialog = false"
+              @click="createResidential()"
             >
               Save
             </v-btn>
@@ -114,11 +116,12 @@
             cols="12"
           >
             <v-text-field
+              v-model="newResidential.name"
               outlined
               label="Name"
             />
           </v-col>
-          <v-col
+          <!--v-col
             class="d-flex"
             cols="12"
           >
@@ -126,8 +129,8 @@
               outlined
               label="Location"
             />
-          </v-col>
-          <v-col
+          </v-col-->
+          <!--v-col
             class="d-flex"
             cols="12"
           >
@@ -137,8 +140,8 @@
               label="Administrator"
               outlined
             />
-          </v-col>
-          <v-container
+          </v-col-->
+          <!--v-container
             v-if="itemSelectAdmin == 'Existing'"
             no-gutters
           >
@@ -155,8 +158,8 @@
                 label="Find user"
               />
             </v-col>
-          </v-container>
-          <v-constainer
+          </v-container-->
+          <!--v-constainer
             v-if="itemSelectAdmin == 'New'"
             no-gutters
           >
@@ -196,7 +199,7 @@
                 label="Password"
               />
             </v-col>
-          </v-constainer>
+          </v-constainer-->
         </v-container>
       </v-card>
     </v-dialog>
@@ -208,58 +211,58 @@ export default {
   data() {
     return {
       dialog: false,
-      notifications: false,
-      sound: true,
-      widgets: false,
       itemsPerPage: 4,
-      items: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          id: 87,
-          calcium: '14%',
-          iron: '1%'
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          id: 129,
-          calcium: '8%',
-          iron: '1%'
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          id: 337,
-          calcium: '6%',
-          iron: '7%'
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          id: 413,
-          calcium: '3%',
-          iron: '8%'
-        }
-      ],
+      residentials: [],
       newResidential: {
         name: null,
         location: null
       },
       itemsSelectAdmin: ['New', 'Existing'],
       itemSelectAdmin: null
+    }
+  },
+  async mounted() {
+    await this.getResidentials()
+  },
+  methods: {
+    async getResidentials() {
+      this.residentials = await this.$axios
+        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residentials')
+        .then((rs) => {
+          return rs.data.Data
+        })
+        .catch((error) => {
+          return []
+        })
+    },
+    async createResidential() {
+      await this.$axios
+        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residentials', {
+          residential_group_id: 0,
+          residential_name: this.newResidential.name
+        })
+        .then((rs) => {
+          this.getResidentials()
+          this.dialog = false
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toast.error('Ocurrio un error, intente de nuevo', {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+          this.dialog = false
+        })
     }
   }
 }

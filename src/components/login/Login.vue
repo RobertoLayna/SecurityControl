@@ -27,6 +27,13 @@
         <v-window v-model="step">
           <v-window-item :value="1">
             <v-card-text class="pt-12">
+              <v-alert
+                type="error"
+                :value="errorAlert"
+                dismissible
+              >
+                {{ errorMessage }}
+              </v-alert>
               <v-text-field
                 v-model="phone"
                 label="Phone number"
@@ -45,7 +52,7 @@
                     color="primary"
                     block
                     tile
-                    @click="step = 2"
+                    @click="preLogin()"
                   >
                     Continue
                   </v-btn>
@@ -69,14 +76,15 @@
               <v-avatar left>
                 <v-icon>mdi-account-circle-outline</v-icon>
               </v-avatar>
-              {{ phone }}
+              {{ userFullName }}
             </v-chip>
             <v-card-text>
               <v-text-field
+                v-model="password"
                 label="Password*"
                 name="password"
                 :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-                :rules="[passwordRules.required, passwordRules.minLenght]"
+                :rules="[passwordRules.required]"
                 :type="showPassword ? 'text' : 'password'"
                 dense
                 @click:append="showPassword = !showPassword"
@@ -94,14 +102,14 @@
                   >
                     Ingresar
                   </v-btn>
-                  <v-btn
+                  <!--v-btn
                     color="primary"
                     small
                     text
                     @click="() => {}"
                   >
                     ¿No recuerda su contraseña?
-                  </v-btn>
+                  </v-btn-->
                 </v-list-item-content>
               </v-list-item>
             </v-card-actions>
@@ -132,6 +140,8 @@ export default {
       step: 1,
       phone: '',
       phoneChip: true,
+      userFullName: '',
+      password: '',
       snackbar: false,
       message: '',
       showPassword: false,
@@ -142,7 +152,9 @@ export default {
       passwordRules: {
         required: (value) => !!value || 'Required'
         //minLenght: (value) => value.length >= 8 || 'Debe contener al menos 8 caracteres'
-      }
+      },
+      errorAlert: false,
+      errorMessage: ''
     }
   },
   methods: {
@@ -150,14 +162,44 @@ export default {
       this.message = message
       this.snackbar = true
     },
-    login(){
-      //TODO
-      this.$router.push({name: 'Administrator'})
+    async preLogin() {
+      try {
+        await this.$axios
+          .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/preLogin', {
+            phone: this.phone
+          })
+          .then((rs) => {
+            if (rs.data.status != "success") throw 'No existe usaurio con ese numero de telefono'
+            this.userFullName = rs.data.data.user_complete_name
+            this.step = 2
+          })
+      } catch (err) {
+        console.log('PreLogin', err)
+        this.errorAlert = true
+        this.errorMessage = err
+      }
+    },
+    async login() {
+      try {
+        await this.$axios
+          .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/login', {
+            phone: this.phone,
+            password: this.password
+          })
+          .then((rs) => {
+            if (rs.data.status != "success") throw 'Password incorrecto.'
+            this.$store.dispatch('setUser', rs.data.data).then(()=>{
+              this.$router.push('/')
+            })
+          })
+      } catch (err) {
+        console.log('PreLogin', err)
+        this.errorAlert = true
+        this.errorMessage = err
+      }
     }
   }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

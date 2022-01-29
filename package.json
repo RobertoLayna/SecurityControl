@@ -45,6 +45,7 @@
     "vue-qrcode-reader": "^3.1.0",
     "vue-router": "^3.2.0",
     "vue-snotify": "^3.2.1",
+    "vue-toast-notification": "^3.0.0",
     "vue-toastification": "^1.7.11",
     "vue2-google-maps": "^0.10.7",
     "vuefire": "^2.2.5",
@@ -53,7 +54,7 @@
     "vuetify-unsplash": "^0.1.8",
     "vuetrend": "^0.3.4",
     "vuex": "^3.4.0",
-    "vuex-persistedstate": "^4.0.0"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@mdi/font": "^5.9.55",

@@ -1,28 +1,29 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistanceState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    user: {
-      role: null,
-      name: null,
-      phone: null
-    },
+    user: {},
     residentials: []
   },
-  mutations: {},
-  actions: {
-    preLogin() {
-      
-    },
-    login() {
-
-    },
-    getResidential(){
-      
+  getters:{
+    user(state){
+      return state.user
     }
   },
-  modules: {}
+  mutations: {
+    user(state, value) {
+      state.user = value
+    }
+  },
+  actions: {
+    setUser({commit}, user) {
+      commit('user', user)
+    }
+  },
+  modules: {},
+  plugins: [createPersistanceState()]
 })
