@@ -239,7 +239,7 @@ export default {
   methods: {
     async getUsers() {
       this.users = await this.$axios
-        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users')
+        .get('https://53ea886.online-server.cloud/users')
         .then((rs) => {
             console.log(this.$_.filter(rs.data.Data, {user_rol: 'security'}))
           return this.$_.filter(rs.data.Data, {user_rol: 'security'})
@@ -251,7 +251,7 @@ export default {
     },
     async createUser() {
       await this.$axios
-        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users', {
+        .post('https://53ea886.online-server.cloud/users', {
           user_residence_id: 0,
           user_complete_name: this.newUser.name,
           user_name: this.newUser.username,

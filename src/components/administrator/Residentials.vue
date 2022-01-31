@@ -225,7 +225,7 @@ export default {
   methods: {
     async getResidentials() {
       this.residentials = await this.$axios
-        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residentials')
+        .get('https://53ea886.online-server.cloud/residentials')
         .then((rs) => {
           return rs.data.Data
         })
@@ -235,7 +235,7 @@ export default {
     },
     async createResidential() {
       await this.$axios
-        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residentials', {
+        .post('https://53ea886.online-server.cloud/residentials', {
           residential_group_id: 0,
           residential_name: this.newResidential.name
         })

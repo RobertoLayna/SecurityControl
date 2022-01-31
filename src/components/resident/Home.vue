@@ -47,7 +47,7 @@ export default {
     async getResidence() {
       this.residence = await this.$axios
         .get(
-          'https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residences/' +
+          'https://53ea886.online-server.cloud/residences/' +
             this.user.user_residence_id
         )
         .then((rs) => {
@@ -60,7 +60,7 @@ export default {
     async getResidential() {
       this.residential = await this.$axios
         .get(
-          'https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residentials/' +
+          'https://53ea886.online-server.cloud/residentials/' +
             this.residence.residence_residential_id
         )
         .then((rs) => {

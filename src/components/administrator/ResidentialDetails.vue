@@ -315,7 +315,7 @@ export default {
   methods: {
     async getResidences() {
       this.residences = await this.$axios
-        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residences')
+        .get('https://53ea886.online-server.cloud/residences')
         .then((rs) => {
           return this.$_.filter(rs.data.Data, {residence_residential_id: this.residential.residential_id})
         })
@@ -326,7 +326,7 @@ export default {
     },
     async createResidence() {
       await this.$axios
-        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/residences', {
+        .post('https://53ea886.online-server.cloud/residences', {
     residence_residential_id: this.residential.residential_id,
     residence_number: this.newResidence.number,
     residence_address: this.newResidence.address,

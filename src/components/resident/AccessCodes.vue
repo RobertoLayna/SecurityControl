@@ -545,7 +545,7 @@ export default {
   methods: {
     async getCodes() {
       this.visits = await this.$axios
-        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/visits')
+        .get('https://53ea886.online-server.cloud/visits')
         .then((rs) => {
           return rs.data.Data
         })
@@ -582,7 +582,7 @@ export default {
           return
         }
       await this.$axios
-        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/visits', {
+        .post('https://53ea886.online-server.cloud/visits', {
           visit_user_id: this.user.user_id,
           visit_start_date: this.newVisitor.startDate,
           visit_end_date: this.newVisitor.endDate,
@@ -616,7 +616,7 @@ export default {
     },
     async deleteItem(){
        await this.$axios
-        .delete('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/visits/'+ this.codeToDelete.id)
+        .delete('https://53ea886.online-server.cloud/visits/'+ this.codeToDelete.id)
         .then(async (rs) => {
           this.dialogDelete = false
           await this.getCodes()
