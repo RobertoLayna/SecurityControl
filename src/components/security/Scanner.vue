@@ -12,8 +12,31 @@
         <qrcode-stream
           :key="_uid"
           :track="selected.value"
-          @init="logErrors"
-        />
+          :camera="camera"
+          @decode="onDecode"
+          @init="onInit"
+        >
+          <div
+            v-if="validationSuccess"
+            class="validation-success"
+          >
+            This is a URL
+          </div>
+
+          <div
+            v-if="validationFailure"
+            class="validation-failure"
+          >
+            This is NOT a URL!
+          </div>
+
+          <div
+            v-if="validationPending"
+            class="validation-pending"
+          >
+            Long validation in progress...
+          </div>
+        </qrcode-stream>
       </v-col>
     </v-row>
     <v-row>
@@ -30,43 +53,60 @@
 <script>
 import { QrcodeStream } from 'vue-qrcode-reader'
 export default {
-    components: {
-        QrcodeStream
+  components: {
+    QrcodeStream
+  },
+  data() {
+    return {
+      options: [
+        { text: 'nothing (default)', value: undefined },
+        { text: 'outline', value: this.paintOutline },
+        { text: 'centered text', value: this.paintCenterText },
+        { text: 'bounding box', value: this.paintBoundingBox }
+      ],
+      selected: this.paintOutline,
+      isValid: undefined,
+      camera: 'auto',
+      result: null
+    }
+  },
+  computed: {
+    validationPending() {
+      return this.isValid === undefined && this.camera === 'off'
     },
-    data () {
-    const options = [
-      { text: "nothing (default)", value: undefined },
-      { text: "outline", value: this.paintOutline },
-      { text: "centered text", value: this.paintCenterText },
-      { text: "bounding box", value: this.paintBoundingBox },
-    ]
 
-    const selected = options[1]
+    validationSuccess() {
+      return this.isValid === true
+    },
 
-    return { selected, options }
+    validationFailure() {
+      return this.isValid === false
+    }
   },
 
   methods: {
-    paintOutline (detectedCodes, ctx) {
+    paintOutline(detectedCodes, ctx) {
       for (const detectedCode of detectedCodes) {
-        const [ firstPoint, ...otherPoints ] = detectedCode.cornerPoints
+        const [firstPoint, ...otherPoints] = detectedCode.cornerPoints
 
-        ctx.strokeStyle = "red";
+        ctx.strokeStyle = 'red'
 
-        ctx.beginPath();
-        ctx.moveTo(firstPoint.x, firstPoint.y);
+        ctx.beginPath()
+        ctx.moveTo(firstPoint.x, firstPoint.y)
         for (const { x, y } of otherPoints) {
-          ctx.lineTo(x, y);
+          ctx.lineTo(x, y)
         }
-        ctx.lineTo(firstPoint.x, firstPoint.y);
-        ctx.closePath();
-        ctx.stroke();
+        ctx.lineTo(firstPoint.x, firstPoint.y)
+        ctx.closePath()
+        ctx.stroke()
       }
     },
 
-    paintBoundingBox (detectedCodes, ctx) {
+    paintBoundingBox(detectedCodes, ctx) {
       for (const detectedCode of detectedCodes) {
-        const { boundingBox: { x, y, width, height } } = detectedCode
+        const {
+          boundingBox: { x, y, width, height }
+        } = detectedCode
 
         ctx.lineWidth = 2
         ctx.strokeStyle = '#007bff'
@@ -74,18 +114,18 @@ export default {
       }
     },
 
-    paintCenterText (detectedCodes, ctx) {
+    paintCenterText(detectedCodes, ctx) {
       for (const detectedCode of detectedCodes) {
         const { boundingBox, rawValue } = detectedCode
 
-        const centerX = boundingBox.x + boundingBox.width/ 2
-        const centerY = boundingBox.y + boundingBox.height/ 2
+        const centerX = boundingBox.x + boundingBox.width / 2
+        const centerY = boundingBox.y + boundingBox.height / 2
 
-        const fontSize = Math.max(12, 50 * boundingBox.width/ctx.canvas.width)
+        const fontSize = Math.max(12, (50 * boundingBox.width) / ctx.canvas.width)
         console.log(boundingBox.width, ctx.canvas.width)
 
         ctx.font = `bold ${fontSize}px sans-serif`
-        ctx.textAlign = "center"
+        ctx.textAlign = 'center'
 
         ctx.lineWidth = 3
         ctx.strokeStyle = '#35495e'
@@ -95,14 +135,100 @@ export default {
         ctx.fillText(rawValue, centerX, centerY)
       }
     },
+    onInit(promise) {
+      promise.catch(console.error).then(this.resetValidationState)
+    },
 
-    logErrors (promise) {
-      promise.catch(console.error)
+    resetValidationState() {
+      this.isValid = undefined
+    },
+
+    async onDecode(content) {
+      this.result = content
+      this.turnCameraOff()
+
+      // pretend it's taking really long
+      await this.timeout(3000)
+      this.isValid = this.isValidateQr(this.result)
+
+      // some more delay, so users have time to read the message
+      await this.timeout(2000)
+
+      this.turnCameraOn()
+    },
+
+    async isValidateQr(content) {
+      this.residence = await this.$axios
+        .get('https://53ea886.online-server.cloud/visits/qr/' + content)
+        .then((rs) => {
+          if (rs.data.Data.length > 0) {
+            this.$toast.success('Codigo valido, registro guardado correctamente', {
+              position: 'bottom-center',
+              timeout: 1500,
+              closeOnClick: true,
+              pauseOnFocusLoss: true,
+              pauseOnHover: true,
+              draggable: true,
+              draggablePercent: 0.6,
+              showCloseButtonOnHover: false,
+              hideProgressBar: true,
+              closeButton: 'button',
+              icon: true,
+              rtl: false
+            })
+          } else {
+            this.$toast.error('Codigo invalido', {
+              position: 'bottom-center',
+              timeout: 5000,
+              closeOnClick: true,
+              pauseOnFocusLoss: true,
+              pauseOnHover: true,
+              draggable: true,
+              draggablePercent: 0.6,
+              showCloseButtonOnHover: false,
+              hideProgressBar: true,
+              closeButton: 'button',
+              icon: true,
+              rtl: false
+            })
+          }
+
+          return rs.data.Data.length > 0
+        })
+        .catch((error) => {
+          this.$toast.error('Ocurrio un error, intente de nuevo', {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+          return false
+        })
+    },
+
+    turnCameraOn() {
+      this.camera = 'auto'
+    },
+
+    turnCameraOff() {
+      this.camera = 'off'
+    },
+
+    timeout(ms) {
+      return new Promise((resolve) => {
+        window.setTimeout(resolve, ms)
+      })
     }
   }
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

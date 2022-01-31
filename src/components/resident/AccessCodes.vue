@@ -27,7 +27,7 @@
         <template v-slot:default="props">
           <v-row no-gutters>
             <v-col
-              v-for="(item, idx) in props.items"
+              v-for="(item) in props.items"
               :key="item.name"
               cols="12"
             >

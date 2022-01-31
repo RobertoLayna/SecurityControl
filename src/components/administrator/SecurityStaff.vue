@@ -8,7 +8,7 @@
             dark
           >
             <v-toolbar-title>Security staff</v-toolbar-title>
-
+​
             <v-spacer /><v-btn
               icon
               primary
@@ -42,6 +42,16 @@
                   >
                     {{ item.user_active ? 'Active' : 'Inactive' }}
                   </v-chip>
+                </template>
+                <template #[`item.actions`]="{ item }">
+                  <v-btn
+                    color="red"
+                    outlined
+                    small
+                    @click="toDelete.dialog = true, toDelete.name = item.user_name, toDelete.id = item.user_id"
+                  >
+                    <v-icon>mdi-trash-can</v-icon>
+                  </v-btn>
                 </template>
               </v-data-table>
             </v-card>
@@ -193,9 +203,40 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-row justify="center">
+      <v-dialog
+        v-model="toDelete.dialog"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            {{ toDelete.item.name }}
+          </v-card-title>
+          <v-card-text>Borrar definitivamente este usuario?</v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              color="error"
+              text
+              @click="toDelete.item = {}, toDelete.dialog = false"
+            >
+              Cancelar
+            </v-btn>
+            <v-btn
+              color="success"
+              text
+              @click="deleteUser()"
+            >
+              Si
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-row>
 </template>
-
+​
 <script>
 export default {
   props: {
@@ -205,6 +246,10 @@ export default {
   data() {
     return {
       dialog: false,
+      toDelete: {
+        dialog: false,
+        item: {}
+      },
       itemsPerPage: 4,
        search: '',
         headers: [
@@ -215,6 +260,7 @@ export default {
           },
           { text: 'Phone', value: 'user_phone' },
           { text: 'Status', value: 'user_active' },
+          { text: '', value: 'actions' },
         ],
       users: [],
       newUser: {
@@ -262,6 +308,20 @@ export default {
         })
         .then((rs) => {
           this.getUsers()
+          this.$toast.success('Usuario guardado correctamente', {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
           this.dialog = false
         })
         .catch((error) => {
@@ -282,9 +342,50 @@ export default {
           })
           this.dialog = false
         })
-    }
+    },
+    async deleteUser() {
+      await this.$axios
+        .delete('https://53ea886.online-server.cloud/users/' + this.toDelete.id)
+        .then((rs) => {
+          this.$toast.success('Usuario borrado correctamente', {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+          this.getUsers()
+          this.toDelete.item = {}
+          this.toDelete.dialog = false
+        })
+        .catch((error) => {
+          this.$toast.error('Ocurrio un error, intente de nuevo', {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+          this.toDelete.item = {}
+          this.toDelete.dialog = false
+        })
+    } 
   }
 }
 </script>
-
+​
 <style></style>

@@ -23,6 +23,17 @@
             >
               <v-icon>mdi-plus</v-icon>
             </v-btn>
+            <v-btn
+              icon
+              color="error"
+              @click="
+                ;(dialogDelete = true),
+                  (residentialToDelete.name = residential.residential_name),
+                  (residentialToDelete.id = residential.residential_id)
+              "
+            >
+              <v-icon>mdi-trash-can</v-icon>
+            </v-btn>
           </v-toolbar>
         </v-card-title>
         <v-card-text class="pa-0">
@@ -107,7 +118,11 @@
                           @click="
                             $router.push({
                               name: 'AdministratorResidenceDetails',
-                              params: { id: item.residence_residential_id, residential: residential, residence: item }
+                              params: {
+                                id: item.residence_residential_id,
+                                residential: residential,
+                                residence: item
+                              }
                             })
                           "
                         >
@@ -274,6 +289,40 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-row
+      no-gutters
+      justify="center"
+    >
+      <v-dialog
+        v-model="dialogDelete"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            {{ residentialToDelete.name }}
+          </v-card-title>
+          <v-card-text>Borrar definitivamente esta residencial?</v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              color="error"
+              text
+              @click="dialogDelete = false"
+            >
+              Cancelar
+            </v-btn>
+            <v-btn
+              color="success"
+              text
+              @click="deleteItem()"
+            >
+              Si
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-row>
 </template>
 
@@ -286,51 +335,55 @@ export default {
     return {
       dialog: false,
       itemsPerPage: 4,
-       search: '',
-        filter: {},
-        sortDesc: false,
-        sortBy: 'residence_number',
-        keys: [
-          'residence_number',
-          'residence_address'
-        ],
+      search: '',
+      filter: {},
+      sortDesc: false,
+      sortBy: 'residence_number',
+      keys: ['residence_number', 'residence_address'],
       residences: [],
       newResidence: {
         number: null,
         address: null
+      },
+      dialogDelete: false,
+      residentialToDelete: {
+        id: null,
+        name: null
       }
     }
   },
   computed: {
-      numberOfPages () {
-        return Math.ceil(this.items.length / this.itemsPerPage)
-      },
-      filteredKeys () {
-        return this.keys.filter(key => key !== 'Name')
-      },
+    numberOfPages() {
+      return Math.ceil(this.items.length / this.itemsPerPage)
     },
+    filteredKeys() {
+      return this.keys.filter((key) => key !== 'Name')
+    }
+  },
   async mounted() {
-      await this.getResidences()
+    await this.getResidences()
   },
   methods: {
     async getResidences() {
       this.residences = await this.$axios
         .get('https://53ea886.online-server.cloud/residences')
         .then((rs) => {
-          return this.$_.filter(rs.data.Data, {residence_residential_id: this.residential.residential_id})
+          return this.$_.filter(rs.data.Data, {
+            residence_residential_id: this.residential.residential_id
+          })
         })
         .catch((error) => {
-            console.log(error)
+          console.log(error)
           return []
         })
     },
     async createResidence() {
       await this.$axios
         .post('https://53ea886.online-server.cloud/residences', {
-    residence_residential_id: this.residential.residential_id,
-    residence_number: this.newResidence.number,
-    residence_address: this.newResidence.address,
-})
+          residence_residential_id: this.residential.residential_id,
+          residence_number: this.newResidence.number,
+          residence_address: this.newResidence.address
+        })
         .then((rs) => {
           this.getResidences()
           this.dialog = false
@@ -352,6 +405,31 @@ export default {
             rtl: false
           })
           this.dialog = false
+        })
+    },
+    async deleteItem() {
+      await this.$axios
+        .delete('https://53ea886.online-server.cloud/residentials/' + this.residentialToDelete.id)
+        .then(async (rs) => {
+          this.dialogDelete = false
+          this.$router.push({ name: 'AdministratorResidentials' })
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toast.error(error, {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
         })
     }
   }
