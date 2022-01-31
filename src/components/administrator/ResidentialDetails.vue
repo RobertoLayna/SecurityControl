@@ -3,7 +3,10 @@
     <v-col cols="12">
       <v-card flat>
         <v-card-title class="pa-0">
-          <v-toolbar>
+          <v-toolbar
+            dark
+            color="primary"
+          >
             <v-btn
               icon
               @click="$router.push({ name: 'AdministratorResidentials' })"
@@ -14,6 +17,12 @@
             <v-toolbar-title>{{ residential.residential_name }} / Residences</v-toolbar-title>
 
             <v-spacer />
+            <v-btn
+              icon
+              @click="dialog = !dialog"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
           </v-toolbar>
         </v-card-title>
         <v-card-text class="pa-0">
@@ -41,13 +50,6 @@
                     label="Search"
                   />
                   <v-spacer />
-
-                  <v-btn
-                    icon
-                    @click="dialog = !dialog"
-                  >
-                    <v-icon>mdi-plus</v-icon>
-                  </v-btn>
                   <template v-if="$vuetify.breakpoint.mdAndUp">
                     <v-spacer />
                     <v-select

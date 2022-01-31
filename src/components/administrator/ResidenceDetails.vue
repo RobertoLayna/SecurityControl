@@ -3,7 +3,10 @@
     <v-col cols="12">
       <v-card flat>
         <v-card-title class="pa-0">
-          <v-toolbar>
+          <v-toolbar
+            dark
+            color="primary"
+          >
             <v-btn
               icon
               @click="$router.push({ name: 'AdministratorResidentials' })"
@@ -14,6 +17,13 @@
             <v-toolbar-title>{{ residential.residential_name }} / {{ residence.residence_number }} / users</v-toolbar-title>
 
             <v-spacer />
+            <v-btn
+              dark
+              icon
+              @click="dialog = !dialog"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
           </v-toolbar>
         </v-card-title>
         <v-card-text class="pa-0">
@@ -27,13 +37,6 @@
                   single-line
                   hide-details
                 />
-                <v-btn
-                  color="primary"
-                  icon
-                  @click="dialog = !dialog"
-                >
-                  <v-icon>mdi-plus</v-icon>
-                </v-btn>
               </v-card-title>
               <v-data-table
                 :headers="headers"
@@ -246,8 +249,8 @@ export default {
       this.users = await this.$axios
         .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users')
         .then((rs) => {
-            console.log(this.$_.filter(rs.data.Data, {user_residence_id: this.residence.residence_id}))
-          return this.$_.filter(rs.data.Data, {user_residence_id: this.residence.residence_id})
+            console.log(this.$_.filter(rs.data.Data, {user_residence_id: this.residence.residence_id, user_rol: 'resident'}))
+          return this.$_.filter(rs.data.Data, {user_residence_id: this.residence.residence_id, user_rol: 'resident'})
         })
         .catch((error) => {
             console.log(error)

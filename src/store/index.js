@@ -22,6 +22,9 @@ export default new Vuex.Store({
   actions: {
     setUser({commit}, user) {
       commit('user', user)
+    },
+    logout({commit}) {
+      commit('user', {})
     }
   },
   modules: {},

@@ -19,7 +19,19 @@ const routes = [
   {
     path: '/resident',
     name: 'Resident',
-    component: () => import('../views/Resident.vue')
+    component: () => import('../views/Resident.vue'),
+    children: [
+      {
+        path: '/',
+        name: 'ResidentHome',
+        component: () => import('../components/resident/Home.vue')
+      },
+      {
+        path: 'access-codes',
+        name: 'ResidentAccessCodes',
+        component: () => import('../components/resident/AccessCodes.vue')
+      }
+    ]
   },
   {
     path: '/security',
@@ -34,7 +46,7 @@ const routes = [
       {
         path: 'service-access',
         name: 'SecurityServiceAccess',
-        component: () => import('../components/administrator/SecurityStaff.vue')
+        component: () => import('../components/security/ServiceAccess.vue')
       },
       {
         path: 'account',
@@ -96,7 +108,9 @@ router.beforeEach((to, from, next) => {
   console.log(from)
   console.log(user)
   if (!user.user_rol) {
-    next({name: 'Home'})
+    if (to.name != "Login") {
+      next({name: 'Login'})
+    }
   } else {
     if (to.name == 'Home' || to.name == 'Login') {
       if (user.user_rol == 'su_admin') next({name: 'Administrator'})

@@ -36,11 +36,17 @@
             </v-list-item-icon>
             <v-list-item-title>Security staff</v-list-item-title>
           </v-list-item>
-          <v-list-item @click="$router.push({name: 'AdministratorAccount'})">
+          <!--v-list-item @click="$router.push({name: 'AdministratorAccount'})">
             <v-list-item-icon>
               <v-icon>mdi-account</v-icon>
             </v-list-item-icon>
             <v-list-item-title>Account</v-list-item-title>
+          </v-list-item-->
+          <v-list-item @click="logout()">
+            <v-list-item-icon>
+              <v-icon>mdi-logout</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Logout</v-list-item-title>
           </v-list-item>
         </v-list-item-group>
       </v-list>
@@ -63,6 +69,13 @@ export default {
   },
   computed: {
     ...mapGetters({ resident: 'resident/getResident' })
+  },
+  methods: {
+    logout(){
+      this.$store.dispatch('logout').then(()=>{
+        this.$router.push({name: "Login"})
+      })
+    }
   }
 }
 </script>

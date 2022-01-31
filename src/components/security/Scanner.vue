@@ -1,18 +1,12 @@
 <template>
   <v-container>
-    <v-row>
-      <p> Track function: </p>
-      <v-select v-model="selected">
-        <option
-          v-for="option in options"
-          :key="option.text"
-          :value="option"
-        >
-          {{ option.text }}
-        </option>
-      </v-select>
-    </v-row>
-
+    <v-toolbar
+      dark
+      color="primary"
+    >
+      <v-toolbar-title>Escaner de acceso</v-toolbar-title>
+      <v-spacer />
+    </v-toolbar>
     <v-row>
       <v-col cols="12">
         <qrcode-stream

@@ -1,58 +1,57 @@
 <template>
   <v-row no-gutters>
     <v-col cols="12">
-      <v-sheet class="ma-3">
-        <v-data-iterator
-          :items="residentials"
-          :items-per-page.sync="itemsPerPage"
-        >
-          <template v-slot:header>
-            <v-toolbar
-              class="mb-2"
-              color="primary darken-5"
-              dark
-              flat
+      <v-data-iterator
+        :items="residentials"
+        :items-per-page.sync="itemsPerPage"
+      >
+        <template v-slot:header>
+          <v-toolbar
+            class="mb-2"
+            color="primary darken-5"
+            dark
+            flat
+          >
+            <v-toolbar-title>Residentials</v-toolbar-title>
+            <v-spacer />
+
+            <v-btn
+              icon
+              @click="dialog = !dialog"
             >
-              <v-toolbar-title>Residentials</v-toolbar-title>
-              <v-spacer />
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-toolbar>
+        </template>
 
-              <v-btn
-                icon
-                @click="dialog = !dialog"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-            </v-toolbar>
-          </template>
+        <template v-slot:default="props">
+          <v-row no-gutters>
+            <v-col
+              v-for="item in props.items"
+              :key="item.name"
+              cols="12"
+            >
+              <v-card>
+                <v-card-title class="subheading font-weight-bold">
+                  {{ item.residential_name }}
+                  <v-spacer />
+                  <v-btn
+                    dark
+                    color="green"
+                    @click="
+                      $router.push({
+                        name: 'AdministratorResidentialDetails',
+                        params: { id: item.residential_id, residential: item }
+                      })
+                    "
+                  >
+                    View
+                  </v-btn>
+                </v-card-title>
 
-          <template v-slot:default="props">
-            <v-row no-gutters>
-              <v-col
-                v-for="item in props.items"
-                :key="item.name"
-                cols="12"
-              >
-                <v-card>
-                  <v-card-title class="subheading font-weight-bold">
-                    {{ item.residential_name }}
-                    <v-spacer />
-                    <v-btn
-                      dark
-                      color="green"
-                      @click="
-                        $router.push({
-                          name: 'AdministratorResidentialDetails',
-                          params: { id: item.residential_id, residential: item }
-                        })
-                      "
-                    >
-                      View
-                    </v-btn>
-                  </v-card-title>
+                <v-divider />
 
-                  <v-divider />
-
-                  <!--v-list dense>
+                <!--v-list dense>
                     <v-list-item>
                       <v-list-item-content>Residents:</v-list-item-content>
                       <v-list-item-content class="align-end">
@@ -60,12 +59,12 @@
                       </v-list-item-content>
                     </v-list-item>
                   </v-list-->
-                </v-card>
-              </v-col>
-            </v-row>
-          </template>
+              </v-card>
+            </v-col>
+          </v-row>
+        </template>
 
-          <!--template v-slot:footer>
+        <!--template v-slot:footer>
             <v-toolbar
               class="mt-2"
               color="primary darken-5"
@@ -77,8 +76,7 @@
               </v-toolbar-title>
             </v-toolbar>
           </template-->
-        </v-data-iterator>
-      </v-sheet>
+      </v-data-iterator>
     </v-col>
     <v-dialog
       v-model="dialog"
@@ -211,7 +209,7 @@ export default {
   data() {
     return {
       dialog: false,
-      itemsPerPage: 4,
+      itemsPerPage: 10,
       residentials: [],
       newResidential: {
         name: null,
