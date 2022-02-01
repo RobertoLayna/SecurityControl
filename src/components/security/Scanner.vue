@@ -134,7 +134,7 @@
             <v-btn
               color="primary"
               text
-              @click="/*toDelete.item = {}, */ infoDialog = false"
+              @click="/*toDelete.item = {}, */ infoDialog = false, inputCode = null"
             >
               Cerrar
             </v-btn>
