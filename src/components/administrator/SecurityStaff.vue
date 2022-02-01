@@ -207,7 +207,10 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-row justify="center">
+    <v-row
+      no-gutters
+      justify="center"
+    >
       <v-dialog
         v-model="toDelete.dialog"
         persistent

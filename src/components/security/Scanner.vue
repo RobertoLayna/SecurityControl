@@ -39,13 +39,115 @@
         </qrcode-stream>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row
+      no-gutters
+      class="my-3"
+      align="center"
+      justify="center"
+    >
       <v-col cols="12">
-        <v-text-field
-          outlined
-          label="Insert code"
-        />
+        <v-row
+          no-gutters
+          align="center"
+        >
+          <v-text-field
+            v-model="inputCode"
+            outlined
+            label="Insert code"
+            :hide-details="true"
+          />
+          <v-btn
+            class="ma-1"
+            color="success"
+            @click="isValidateQr(inputCode)"
+          >
+            <v-icon>mdi-arrow-right-circle</v-icon>
+          </v-btn>
+        </v-row>
       </v-col>
+    </v-row>
+    <v-row
+      no-gutters
+      justify="center"
+    >
+      <v-dialog
+        v-model="infoDialog"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            Visitante
+          </v-card-title>
+          <v-card-text>
+            <v-row
+              no-gutters
+              class="pb-0"
+            >
+              <p class="h6 black--text pb-0 mb-0">
+                {{ visitor.visit_visitor_name }}
+              </p>
+            </v-row>
+            <v-row
+              no-gutters
+              class="pt-0"
+            >
+              <p class="caption pt-0">
+                Nombre del visitante
+              </p>
+            </v-row>
+            <v-row
+              no-gutters
+              class="pb-0"
+            >
+              <p class="h6 black--text pb-0 mb-0">
+                {{ userVisitor.user_complete_name }}
+              </p>
+            </v-row>
+            <v-row
+              no-gutters
+              class="pt-0"
+            >
+              <p class="caption pt-0">
+                A quien visita
+              </p>
+            </v-row>
+            <v-row
+              no-gutters
+              class="pb-0"
+            >
+              <p class="h6 black--text pb-0 mb-0">
+                {{ userResidence.residence_address }}
+              </p>
+            </v-row>
+            <v-row
+              no-gutters
+              class="pt-0"
+            >
+              <p class="caption pt-0">
+                Direccion
+              </p>
+            </v-row>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              text
+              @click="/*toDelete.item = {}, */ infoDialog = false"
+            >
+              Cerrar
+            </v-btn>
+            <!--v-btn
+              color="success"
+              text
+              @click="deleteUser()"
+            >
+              Ok
+            </v-btn-->
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-row>
   </v-container>
 </template>
@@ -67,10 +169,16 @@ export default {
       selected: this.paintOutline,
       isValid: undefined,
       camera: 'auto',
-      result: null
+      result: null,
+      infoDialog: false,
+      inpputCode: null,
+      visitor: {},
+      userVisitor: {},
+      userResidence: {}
     }
   },
   computed: {
+    
     validationPending() {
       return this.isValid === undefined && this.camera === 'off'
     },
@@ -81,6 +189,14 @@ export default {
 
     validationFailure() {
       return this.isValid === false
+    }
+  },
+  watch: {
+    async visitor() {
+      await this.getUser()
+    },
+    async userVisitor() {
+      await this.getUserResidence()
     }
   },
 
@@ -162,6 +278,8 @@ export default {
         .get('https://53ea886.online-server.cloud/visits/qr/' + content)
         .then((rs) => {
           if (rs.data.Data.length > 0) {
+            this.visitor = rs.data.Data[0]
+            this.infoDialog = true
             this.$toast.success('Codigo valido, registro guardado correctamente', {
               position: 'bottom-center',
               timeout: 1500,
@@ -211,6 +329,28 @@ export default {
             rtl: false
           })
           return false
+        })
+    },
+
+    async getUser() {
+      this.userVisitor = await this.$axios
+        .get('https://53ea886.online-server.cloud/users/' + this.visitor.visit_user_id)
+        .then((rs) => {
+          return rs.data.Data
+        })
+        .catch((error) => {
+          return []
+        })
+    },
+
+    async getUserResidence(){
+      this.userResidence = await this.$axios
+        .get('https://53ea886.online-server.cloud/residences/' + this.userVisitor.user_residence_id)
+        .then((rs) => {
+          return rs.data.Data
+        })
+        .catch((error) => {
+          return []
         })
     },
 
