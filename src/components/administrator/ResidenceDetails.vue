@@ -1,62 +1,67 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="12">
-      <v-card flat>
-        <v-card-title class="pa-0">
-          <v-toolbar
-            dark
-            color="primary"
+  <v-container
+    fluid
+    ma-0
+    pa-0
+    class="align-start justify-center"
+  >
+    <v-card flat>
+      <v-card-title class="pa-0">
+        <v-toolbar
+          dark
+          color="primary"
+        >
+          <v-btn
+            icon
+            @click="$router.push({ name: 'AdministratorResidentials' })"
           >
-            <v-btn
-              icon
-              @click="$router.push({ name: 'AdministratorResidentials' })"
-            >
-              <v-icon>mdi-arrow-left</v-icon>
-            </v-btn>
+            <v-icon>mdi-arrow-left</v-icon>
+          </v-btn>
 
-            <v-toolbar-title>{{ residential.residential_name }} / {{ residence.residence_number }} / users</v-toolbar-title>
+          <v-toolbar-title>
+            {{ residential.residential_name }} / {{ residence.residence_number }} / users
+          </v-toolbar-title>
 
-            <v-spacer />
-            <v-btn
-              dark
-              icon
-              @click="dialog = !dialog"
+          <v-spacer />
+          <v-btn
+            dark
+            icon
+            @click="dialog = !dialog"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card-title>
+      <v-card-text class="pa-0">
+        <v-row no-gutters>
+          <v-card>
+            <v-card-title>
+              <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Search"
+                single-line
+                hide-details
+              />
+            </v-card-title>
+            <v-data-table
+              :headers="headers"
+              :items="users"
+              :search="search"
             >
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </v-toolbar>
-        </v-card-title>
-        <v-card-text class="pa-0">
-          <v-row no-gutters>
-            <v-card>
-              <v-card-title>
-                <v-text-field
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                />
-              </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="users"
-                :search="search"
-              >
-                <template #[`item.user_active`]="{ item }">
-                  <v-chip
-                    :color="item.user_active ? 'success' : 'error'"
-                    dark
-                  >
-                    {{ item.user_active ? 'Active' : 'Inactive' }}
-                  </v-chip>
-                </template>
-              </v-data-table>
-            </v-card>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-col>
+              <template #[`item.user_active`]="{ item }">
+                <v-chip
+                  :color="item.user_active ? 'success' : 'error'"
+                  dark
+                >
+                  {{ item.user_active ? 'Active' : 'Inactive' }}
+                </v-chip>
+              </template>
+            </v-data-table>
+          </v-card>
+        </v-row>
+      </v-card-text>
+    </v-card>
     <v-dialog
       v-model="dialog"
       fullscreen
@@ -201,7 +206,7 @@
         </v-container>
       </v-card>
     </v-dialog>
-  </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -214,16 +219,16 @@ export default {
     return {
       dialog: false,
       itemsPerPage: 4,
-       search: '',
-        headers: [
-          {
-            text: 'Name',
-            align: 'start',
-            value: 'user_complete_name',
-          },
-          { text: 'Phone', value: 'user_phone' },
-          { text: 'Status', value: 'user_active' },
-        ],
+      search: '',
+      headers: [
+        {
+          text: 'Name',
+          align: 'start',
+          value: 'user_complete_name'
+        },
+        { text: 'Phone', value: 'user_phone' },
+        { text: 'Status', value: 'user_active' }
+      ],
       users: [],
       newUser: {
         name: '',
@@ -234,32 +239,40 @@ export default {
     }
   },
   computed: {
-      numberOfPages () {
-        return Math.ceil(this.items.length / this.itemsPerPage)
-      },
-      filteredKeys () {
-        return this.keys.filter(key => key !== 'Name')
-      },
+    numberOfPages() {
+      return Math.ceil(this.items.length / this.itemsPerPage)
     },
+    filteredKeys() {
+      return this.keys.filter((key) => key !== 'Name')
+    }
+  },
   async mounted() {
-      await this.getUsers()
+    await this.getUsers()
   },
   methods: {
     async getUsers() {
       this.users = await this.$axios
-        .get('https://53ea886.online-server.cloud/users')
+        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users')
         .then((rs) => {
-            console.log(this.$_.filter(rs.data.Data, {user_residence_id: this.residence.residence_id, user_rol: 'resident'}))
-          return this.$_.filter(rs.data.Data, {user_residence_id: this.residence.residence_id, user_rol: 'resident'})
+          console.log(
+            this.$_.filter(rs.data.Data, {
+              user_residence_id: this.residence.residence_id,
+              user_rol: 'resident'
+            })
+          )
+          return this.$_.filter(rs.data.Data, {
+            user_residence_id: this.residence.residence_id,
+            user_rol: 'resident'
+          })
         })
         .catch((error) => {
-            console.log(error)
+          console.log(error)
           return []
         })
     },
     async createUser() {
       await this.$axios
-        .post('https://53ea886.online-server.cloud/users', {
+        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users', {
           user_residence_id: this.residence.residence_id,
           user_complete_name: this.newUser.name,
           user_name: this.newUser.username,

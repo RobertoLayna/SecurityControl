@@ -16,6 +16,7 @@
             <v-spacer />
 
             <v-btn
+              v-if="user.user_rol == 'su_admin'"
               icon
               @click="dialog = !dialog"
             >

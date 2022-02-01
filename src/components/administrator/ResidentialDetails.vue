@@ -1,8 +1,13 @@
 <template>
-  <v-row no-gutters>
-    <v-col cols="12">
-      <v-card flat>
-        <v-card-title class="pa-0">
+  <v-container
+    fluid
+    ma-0
+    pa-0
+    class="align-start justify-center"
+  >
+    <v-card flat>
+      <v-card-title class="pa-0">
+        <v-row no-gutters>
           <v-toolbar
             dark
             color="primary"
@@ -24,6 +29,7 @@
               <v-icon>mdi-plus</v-icon>
             </v-btn>
             <v-btn
+              v-if="user.user_rol == 'su_admin'"
               icon
               color="error"
               @click="
@@ -35,90 +41,89 @@
               <v-icon>mdi-trash-can</v-icon>
             </v-btn>
           </v-toolbar>
-        </v-card-title>
-        <v-card-text class="pa-0">
-          <v-row no-gutters>
-            <v-data-iterator
-              :items="residences"
-              :items-per-page.sync="itemsPerPage"
-              :search="search"
-              :sort-by="sortBy.toLowerCase()"
-              :sort-desc="sortDesc"
-            >
-              <template v-slot:header>
-                <v-toolbar
-                  dark
-                  color="primary darken-3"
-                  class="mb-1"
-                >
-                  <v-text-field
-                    v-model="search"
-                    clearable
+        </v-row>
+      </v-card-title>
+      <v-card-text class="pa-0">
+        <v-row no-gutters>
+          <v-data-iterator
+            :items="residences"
+            :items-per-page.sync="itemsPerPage"
+            :search="search"
+            :sort-by="sortBy.toLowerCase()"
+            :sort-desc="sortDesc"
+          >
+            <template v-slot:header>
+              <v-toolbar
+                dark
+                color="primary darken-3"
+                class="mb-1"
+              >
+                <v-text-field
+                  v-model="search"
+                  clearable
+                  flat
+                  solo-inverted
+                  hide-details
+                  prepend-inner-icon="mdi-magnify"
+                  label="Search"
+                />
+                <v-spacer />
+                <template v-if="$vuetify.breakpoint.mdAndUp">
+                  <v-spacer />
+                  <v-select
+                    v-model="sortBy"
                     flat
                     solo-inverted
                     hide-details
+                    :items="keys"
                     prepend-inner-icon="mdi-magnify"
-                    label="Search"
+                    label="Sort by"
                   />
                   <v-spacer />
-                  <template v-if="$vuetify.breakpoint.mdAndUp">
-                    <v-spacer />
-                    <v-select
-                      v-model="sortBy"
-                      flat
-                      solo-inverted
-                      hide-details
-                      :items="keys"
-                      prepend-inner-icon="mdi-magnify"
-                      label="Sort by"
-                    />
-                    <v-spacer />
-                    <v-btn-toggle
-                      v-model="sortDesc"
-                      mandatory
-                    >
-                      <v-btn
-                        large
-                        depressed
-                        color="primary"
-                        :value="false"
-                      >
-                        <v-icon>mdi-arrow-up</v-icon>
-                      </v-btn>
-                      <v-btn
-                        large
-                        depressed
-                        color="primary"
-                        :value="true"
-                      >
-                        <v-icon>mdi-arrow-down</v-icon>
-                      </v-btn>
-                    </v-btn-toggle>
-                  </template>
-                </v-toolbar>
-              </template>
-
-              <template v-slot:default="props">
-                <v-row no-gutters>
-                  <v-col
-                    v-for="item in props.items"
-                    :key="item.name"
-                    cols="12"
-                    sm="6"
-                    md="4"
-                    lg="3"
+                  <v-btn-toggle
+                    v-model="sortDesc"
+                    mandatory
                   >
+                    <v-btn
+                      large
+                      depressed
+                      color="primary"
+                      :value="false"
+                    >
+                      <v-icon>mdi-arrow-up</v-icon>
+                    </v-btn>
+                    <v-btn
+                      large
+                      depressed
+                      color="primary"
+                      :value="true"
+                    >
+                      <v-icon>mdi-arrow-down</v-icon>
+                    </v-btn>
+                  </v-btn-toggle>
+                </template>
+              </v-toolbar>
+            </template>
+
+            <template v-slot:default="props">
+              <v-row
+                v-for="item in props.items"
+                :key="item.name"
+                no-gutters
+              >
+                <v-col cols="12">
+                  <v-container>
                     <v-card>
-                      <v-card-subtitle>
-                        <v-chip
-                          :color="item.residence_active ? 'success' : 'error'"
-                          dark
-                        >
-                          {{ item.residence_active ? 'Active' : 'Inactive' }}
-                        </v-chip>
-                      </v-card-subtitle>
                       <v-card-title class="subheading font-weight-bold">
-                        {{ item.residence_number }}
+                        <v-row no-gutters>
+                          <v-chip
+                            :color="item.residence_active ? 'success' : 'error'"
+                            dark
+                          >
+                            {{ item.residence_active ? 'Active' : 'Inactive' }}
+                          </v-chip>
+                          {{ item.residence_number }}
+                        </v-row>
                         <v-spacer />
                         <v-btn
                           icon
@@ -136,19 +141,19 @@
                         >
                           <v-icon>mdi-cog</v-icon>
                         </v-btn>
-                      </v-card-title>
-                      <v-card-subtitle>
+                      </v-card-title><v-card-subtitle>
                         {{ item.residence_address }}
                       </v-card-subtitle>
+
                       <v-divider />
-                      <v-card-subtitle>
+                      <v-card-actions>
                         <v-btn
                           v-if="item.residence_active"
                           outlined
                           color="error"
                           @click="setActive(item.residence_id, !item.residence_active)"
                         >
-                          Mark as Inactive
+                          Desactivar
                         </v-btn>
                         <v-btn
                           v-else
@@ -156,9 +161,21 @@
                           color="success"
                           @click="setActive(item.residence_id, !item.residence_active)"
                         >
-                          Mark as Active
+                          Activar
                         </v-btn>
-                      </v-card-subtitle>
+                        <v-spacer />
+                        <v-btn
+                          outlined
+                          color="error"
+                          @click="
+                            ;(dialogDeleteHouse = true),
+                              (HouseToDelete.name = item.residence_number),
+                              (HouseToDelete.id = item.residence_id)
+                          "
+                        >
+                          Borrar casa
+                        </v-btn>
+                      </v-card-actions>
                       <!--v-list dense>
                     <v-list-item>
                       <v-list-item-content>Residents:</v-list-item-content>
@@ -168,11 +185,12 @@
                     </v-list-item>
                   </v-list-->
                     </v-card>
-                  </v-col>
-                </v-row>
-              </template>
+                  </v-container>
+                </v-col>
+              </v-row>
+            </template>
 
-              <!--template v-slot:footer>
+            <!--template v-slot:footer>
             <v-toolbar
               class="mt-2"
               color="primary darken-5"
@@ -184,63 +202,64 @@
               </v-toolbar-title>
             </v-toolbar>
           </template-->
-            </v-data-iterator>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-col>
-    <v-dialog
-      v-model="dialog"
-      fullscreen
-      hide-overlay
-      transition="dialog-bottom-transition"
-    >
-      <v-card>
-        <v-toolbar
-          dark
-          color="primary"
+          </v-data-iterator>
+        </v-row>
+      </v-card-text>
+    </v-card>
+    <v-row no-gutters>
+      <v-col cols="12">
+        <v-dialog
+          v-model="dialog"
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
         >
-          <v-btn
-            icon
-            dark
-            @click="dialog = false"
-          >
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          <v-toolbar-title>Create new</v-toolbar-title>
-          <v-spacer />
-          <v-toolbar-items>
-            <v-btn
+          <v-card>
+            <v-toolbar
               dark
-              text
-              @click="createResidence()"
+              color="primary"
             >
-              Save
-            </v-btn>
-          </v-toolbar-items>
-        </v-toolbar>
-        <v-container>
-          <v-col
-            class="d-flex"
-            cols="12"
-          >
-            <v-text-field
-              v-model.number="newResidence.number"
-              outlined
-              label="Number"
-            />
-          </v-col>
-          <v-col
-            class="d-flex"
-            cols="12"
-          >
-            <v-text-field
-              v-model="newResidence.address"
-              outlined
-              label="Address"
-            />
-          </v-col>
-          <!--v-col
+              <v-btn
+                icon
+                dark
+                @click="dialog = false"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+              <v-toolbar-title>Create new</v-toolbar-title>
+              <v-spacer />
+              <v-toolbar-items>
+                <v-btn
+                  dark
+                  text
+                  @click="createResidence()"
+                >
+                  Save
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-container>
+              <v-col
+                class="d-flex"
+                cols="12"
+              >
+                <v-text-field
+                  v-model.number="newResidence.number"
+                  outlined
+                  label="Number"
+                />
+              </v-col>
+              <v-col
+                class="d-flex"
+                cols="12"
+              >
+                <v-text-field
+                  v-model="newResidence.address"
+                  outlined
+                  label="Address"
+                />
+              </v-col>
+              <!--v-col
             class="d-flex"
             cols="12"
           >
@@ -251,7 +270,7 @@
               outlined
             />
           </v-col-->
-          <!--v-container
+              <!--v-container
             v-if="itemSelectAdmin == 'Existing'"
             no-gutters
           >
@@ -269,7 +288,7 @@
               />
             </v-col>
           </v-container-->
-          <!--v-constainer
+              <!--v-constainer
             v-if="itemSelectAdmin == 'New'"
             no-gutters
           >
@@ -310,47 +329,124 @@
               />
             </v-col>
           </v-constainer-->
-        </v-container>
-      </v-card>
-    </v-dialog>
+            </v-container>
+          </v-card>
+        </v-dialog>
+      </v-col>
+    </v-row>
     <v-row
       no-gutters
       justify="center"
     >
-      <v-dialog
-        v-model="dialogDelete"
-        persistent
-        max-width="290"
-      >
-        <v-card>
-          <v-card-title class="text-h5">
-            {{ residentialToDelete.name }}
-          </v-card-title>
-          <v-card-text>Borrar definitivamente esta residencial?</v-card-text>
-          <v-card-actions>
-            <v-spacer />
-            <v-btn
-              color="error"
-              text
-              @click="dialogDelete = false"
-            >
-              Cancelar
-            </v-btn>
-            <v-btn
-              color="success"
-              text
-              @click="deleteItem()"
-            >
-              Si
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <v-col cols="12">
+        <v-dialog
+          v-model="dialogDelete"
+          persistent
+          max-width="290"
+        >
+          <v-card>
+            <v-card-title class="text-h5">
+              {{ residentialToDelete.name }}
+            </v-card-title>
+            <v-card-text>Borrar definitivamente esta residencial?</v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                color="error"
+                text
+                @click="dialogDelete = false"
+              >
+                Cancelar
+              </v-btn>
+              <v-btn
+                color="success"
+                text
+                @click="deleteItem()"
+              >
+                Si
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-col>
     </v-row>
-  </v-row>
+    <v-row
+      no-gutters
+      justify="center"
+    >
+      <v-col cols="12">
+        <v-dialog
+          v-model="dialogDelete"
+          persistent
+          max-width="290"
+        >
+          <v-card>
+            <v-card-title class="text-h5">
+              {{ residentialToDelete.name }}
+            </v-card-title>
+            <v-card-text>Borrar definitivamente esta residencial?</v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                color="error"
+                text
+                @click="dialogDelete = false"
+              >
+                Cancelar
+              </v-btn>
+              <v-btn
+                color="success"
+                text
+                @click="deleteItem()"
+              >
+                Si
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-col>
+    </v-row>
+    <v-row
+      no-gutters
+      justify="center"
+    >
+      <v-col cols="12">
+        <v-dialog
+          v-model="dialogDeleteHouse"
+          persistent
+          max-width="290"
+        >
+          <v-card>
+            <v-card-title class="text-h5">
+              {{ HouseToDelete.name }}
+            </v-card-title>
+            <v-card-text>Borrar definitivamente esta casa?</v-card-text>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn
+                color="error"
+                text
+                @click="dialogDeleteHouse = false"
+              >
+                Cancelar
+              </v-btn>
+              <v-btn
+                color="success"
+                text
+                @click="deleteHouseItem()"
+              >
+                Si
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   props: {
     residential: { type: Object, default: () => {} }
@@ -370,6 +466,11 @@ export default {
         address: null
       },
       dialogDelete: false,
+      dialogDeleteHouse: false,
+      HouseToDelete: {
+        id: null,
+        name: null
+      },
       residentialToDelete: {
         id: null,
         name: null
@@ -377,6 +478,7 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({ user: 'user' }),
     numberOfPages() {
       return Math.ceil(this.items.length / this.itemsPerPage)
     },
@@ -412,6 +514,10 @@ export default {
         .then((rs) => {
           this.getResidences()
           this.dialog = false
+          this.newResidence = {
+            id: null,
+            name: null
+          }
         })
         .catch((error) => {
           console.log(error)
@@ -457,12 +563,34 @@ export default {
           })
         })
     },
+    async deleteHouseItem() {
+      await this.$axios
+        .delete('https://53ea886.online-server.cloud/residences/' + this.HouseToDelete.id)
+        .then(async (rs) => {
+          this.getResidences()
+          this.dialogDeleteHouse = false
+        })
+        .catch((error) => {
+          console.log(error)
+          this.$toast.error(error, {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+        })
+    },
     async setActive(id, status) {
       await this.$axios
-        .put(
-          'https://53ea886.online-server.cloud/residences/' + id,
-          { residence_active: status }
-        )
+        .put('https://53ea886.online-server.cloud/residences/' + id, { residence_active: status })
         .then(async (rs) => {
           this.getResidences()
         })
