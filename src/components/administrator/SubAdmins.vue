@@ -7,7 +7,7 @@
             color="primary"
             dark
           >
-            <v-toolbar-title>Security staff</v-toolbar-title>
+            <v-toolbar-title>Residential Admins</v-toolbar-title>
             ​
             <v-spacer /><v-btn
               icon
@@ -48,7 +48,11 @@
                     color="red"
                     outlined
                     small
-                    @click="toDelete.dialog = true, toDelete.name = item.user_name, toDelete.id = item.user_id"
+                    @click="
+                      ;(toDelete.dialog = true),
+                        (toDelete.name = item.user_name),
+                        (toDelete.id = item.user_id)
+                    "
                   >
                     <v-icon>mdi-trash-can</v-icon>
                   </v-btn>
@@ -97,9 +101,23 @@
             <v-text-field
               v-model.number="newUser.name"
               outlined
-              label="Caseta/Nombre"
+              label="Full name"
             />
           </v-col>
+          <v-col
+            class="d-flex"
+            cols="12"
+          >
+            <v-text-field
+              v-model="newUser.phone"
+              outlined
+              maxlength="10"
+              label="Telefono"
+              @keydown.space.prevent
+              @keypress="onlyNumbers($event)"
+            />
+          </v-col>
+
           <!--v-col
             class="d-flex"
             cols="12"
@@ -115,23 +133,21 @@
             cols="12"
           >
             <v-text-field
-              v-model="newUser.phone"
+              v-model="newUser.password"
               outlined
-              maxlength="10"
-              label="Telefono"
-              @keydown.space.prevent
-              @keypress="onlyNumbers($event)"
+              label="Password"
             />
           </v-col>
           <v-col
             class="d-flex"
             cols="12"
           >
-            <v-text-field
-              v-model="newUser.password"
+            <v-select
+              :items="residentials"
+              label="Selec residential"
+              item-text="residential_name"
+              item-value="abbr"
               outlined
-              label="Password"
-              @keydown.space.prevent
             />
           </v-col>
           <!--v-col
@@ -207,7 +223,10 @@
         </v-container>
       </v-card>
     </v-dialog>
-    <v-row justify="center">
+    <v-row
+      no-gutters
+      justify="center"
+    >
       <v-dialog
         v-model="toDelete.dialog"
         persistent
@@ -223,7 +242,7 @@
             <v-btn
               color="error"
               text
-              @click="toDelete.item = {}, toDelete.dialog = false"
+              @click=";(toDelete.item = {}), (toDelete.dialog = false)"
             >
               Cancelar
             </v-btn>
@@ -255,17 +274,19 @@ export default {
         item: {}
       },
       itemsPerPage: 4,
-       search: '',
-        headers: [
-          {
-            text: 'Name',
-            align: 'start',
-            value: 'user_complete_name',
-          },
-          { text: 'Phone', value: 'user_phone' },
-          { text: 'Status', value: 'user_active' },
-          { text: '', value: 'actions' },
-        ],
+      search: '',
+      headers: [
+        {
+          text: 'Name',
+          align: 'start',
+          value: 'user_complete_name'
+        },
+        { text: 'Phone', value: 'user_phone' },
+        { text: 'Residential', value: 'user_phone' },
+        { text: 'Status', value: 'user_active' },
+        { text: '', value: 'actions' }
+      ],
+      residentials: [],
       users: [],
       newUser: {
         name: '',
@@ -276,26 +297,37 @@ export default {
     }
   },
   computed: {
-      numberOfPages () {
-        return Math.ceil(this.items.length / this.itemsPerPage)
-      },
-      filteredKeys () {
-        return this.keys.filter(key => key !== 'Name')
-      },
+    numberOfPages() {
+      return Math.ceil(this.items.length / this.itemsPerPage)
     },
+    filteredKeys() {
+      return this.keys.filter((key) => key !== 'Name')
+    }
+  },
   async mounted() {
-      await this.getUsers()
+    await this.getUsers()
+    await this.getResidentials()
   },
   methods: {
+    async getResidentials() {
+      this.residentials = await this.$axios
+        .get('https://53ea886.online-server.cloud/residentials')
+        .then((rs) => {
+          return rs.data.Data
+        })
+        .catch((error) => {
+          return []
+        })
+    },
     async getUsers() {
       this.users = await this.$axios
         .get('https://53ea886.online-server.cloud/users')
         .then((rs) => {
-            console.log(this.$_.filter(rs.data.Data, {user_rol: 'security'}))
-          return this.$_.filter(rs.data.Data, {user_rol: 'security'})
+          console.log(this.$_.filter(rs.data.Data, { user_rol: 'administrator' }))
+          return this.$_.filter(rs.data.Data, { user_rol: 'administrator' })
         })
         .catch((error) => {
-            console.log(error)
+          console.log(error)
           return []
         })
     },
@@ -307,7 +339,7 @@ export default {
           user_name: '-',
           user_password: this.newUser.password,
           user_phone: this.newUser.phone,
-          user_rol: 'security',
+          user_rol: 'administrator',
           user_active: true
         })
         .then((rs) => {

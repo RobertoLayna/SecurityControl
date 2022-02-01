@@ -78,7 +78,12 @@ const routes = [
         props: true
       },
       {
-        path: 'securityStaff',
+        path: 'residential-admins',
+        name: 'AdministratorSubAdmins',
+        component: () => import('../components/administrator/SubAdmins.vue')
+      },
+      {
+        path: 'security-staff',
         name: 'AdministratorSecurityStaff',
         component: () => import('../components/administrator/SecurityStaff.vue')
       },

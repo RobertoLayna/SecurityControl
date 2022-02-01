@@ -30,6 +30,12 @@
             </v-list-item-icon>
             <v-list-item-title>Residentials</v-list-item-title>
           </v-list-item>
+          <v-list-item @click="$router.push({name: 'AdministratorSubAdmins'})">
+            <v-list-item-icon>
+              <v-icon>mdi-shield-crown-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>Residential Admins</v-list-item-title>
+          </v-list-item>
           <v-list-item @click="$router.push({name: 'AdministratorSecurityStaff'})">
             <v-list-item-icon>
               <v-icon>mdi-shield-account</v-icon>
