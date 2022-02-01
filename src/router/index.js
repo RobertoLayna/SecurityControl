@@ -39,6 +39,11 @@ const routes = [
     component: () => import('../views/Security.vue'),
     children: [
       {
+        path: '/',
+        name: 'Security',
+        component: () => import('../components/security/Scanner.vue')
+      },
+      {
         path: 'scanner',
         name: 'SecurityScanner',
         component: () => import('../components/security/Scanner.vue')
@@ -62,7 +67,7 @@ const routes = [
     children: [
       {
         path: '/',
-        name: 'AdministratorResidentials',
+        name: 'Administrator',
         component: () => import('../components/administrator/Residentials.vue')
       },
       {
