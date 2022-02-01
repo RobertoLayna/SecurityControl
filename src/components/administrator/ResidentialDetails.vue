@@ -109,6 +109,14 @@
                     lg="3"
                   >
                     <v-card>
+                      <v-card-subtitle>
+                        <v-chip
+                          :color="item.residence_active ? 'success' : 'error'"
+                          dark
+                        >
+                          {{ item.residence_active ? 'Active' : 'Inactive' }}
+                        </v-chip>
+                      </v-card-subtitle>
                       <v-card-title class="subheading font-weight-bold">
                         {{ item.residence_number }}
                         <v-spacer />
@@ -132,9 +140,25 @@
                       <v-card-subtitle>
                         {{ item.residence_address }}
                       </v-card-subtitle>
-
                       <v-divider />
-
+                      <v-card-subtitle>
+                        <v-btn
+                          v-if="item.residence_active"
+                          outlined
+                          color="error"
+                          @click="setActive(item.residence_id, !item.residence_active)"
+                        >
+                          Mark as Inactive
+                        </v-btn>
+                        <v-btn
+                          v-else
+                          outlined
+                          color="success"
+                          @click="setActive(item.residence_id, !item.residence_active)"
+                        >
+                          Mark as Active
+                        </v-btn>
+                      </v-card-subtitle>
                       <!--v-list dense>
                     <v-list-item>
                       <v-list-item-content>Residents:</v-list-item-content>
@@ -382,7 +406,8 @@ export default {
         .post('https://53ea886.online-server.cloud/residences', {
           residence_residential_id: this.residential.residential_id,
           residence_number: this.newResidence.number,
-          residence_address: this.newResidence.address
+          residence_address: this.newResidence.address,
+          residence_active: true
         })
         .then((rs) => {
           this.getResidences()
@@ -416,6 +441,32 @@ export default {
         })
         .catch((error) => {
           console.log(error)
+          this.$toast.error(error, {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+        })
+    },
+    async setActive(id, status) {
+      await this.$axios
+        .put(
+          'https://53ea886.online-server.cloud/residences/' + id,
+          { residence_active: status }
+        )
+        .then(async (rs) => {
+          this.getResidences()
+        })
+        .catch((error) => {
           this.$toast.error(error, {
             position: 'bottom-center',
             timeout: 5000,

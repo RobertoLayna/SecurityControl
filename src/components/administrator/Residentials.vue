@@ -205,6 +205,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   data() {
     return {
@@ -219,15 +220,29 @@ export default {
       itemSelectAdmin: null
     }
   },
+  computed: {
+    ...mapGetters({ user: 'user' })
+  },
+  watch: {
+    async user() {
+      await this.getResidentials()
+    }
+  },
   async mounted() {
     await this.getResidentials()
   },
+
   methods: {
     async getResidentials() {
+      const url =
+        this.user.user_rol != 'su_admin'
+          ? 'https://53ea886.online-server.cloud/residentials/' + this.user.user_residential_id
+          : 'https://53ea886.online-server.cloud/residentials'
       this.residentials = await this.$axios
-        .get('https://53ea886.online-server.cloud/residentials')
+        .get(url)
         .then((rs) => {
-          return rs.data.Data
+          if (Array.isArray(rs.data.Data)) return rs.data.Data
+          return [rs.data.Data]
         })
         .catch((error) => {
           return []

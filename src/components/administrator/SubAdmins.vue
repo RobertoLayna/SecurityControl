@@ -144,10 +144,12 @@
             cols="12"
           >
             <v-select
+              v-model="newUser.residentialSelect"
+              required
               :items="residentials"
               label="Selec residential"
               item-text="residential_name"
-              item-value="abbr"
+              item-value="residential_id"
               outlined
             />
           </v-col>
@@ -293,7 +295,8 @@ export default {
         name: '',
         username: '',
         password: '',
-        phone: ''
+        phone: '',
+        residentialSelect: null
       }
     }
   },
@@ -341,7 +344,8 @@ export default {
           user_password: this.newUser.password,
           user_phone: this.newUser.phone,
           user_rol: 'administrator',
-          user_active: true
+          user_active: true,
+          user_residential_id: this.newUser.residentialSelect
         })
         .then((rs) => {
           this.getUsers()
