@@ -116,7 +116,7 @@
             <v-text-field
               v-model="newResidential.name"
               outlined
-              label="Name"
+              label="Nombre"
             />
           </v-col>
           <!--v-col

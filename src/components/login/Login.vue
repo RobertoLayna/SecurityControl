@@ -40,8 +40,11 @@
                 name="phone"
                 :rules="[phoneRules.required]"
                 type="text"
+                maxlength="10"
                 clearable
                 dense
+                @keydown.space.prevent
+                @keypress="onlyNumbers($event)"
               />
             </v-card-text>
             <v-divider />
@@ -196,6 +199,14 @@ export default {
         console.log('PreLogin', err)
         this.errorAlert = true
         this.errorMessage = err
+      }
+    },
+    onlyNumbers(event){
+      let keyCode = event.keyCode ? event.keyCode : event.which
+      if ((keyCode >= 48 && keyCode <= 57) || event.key == '.') {
+        return
+      } else {
+        event.preventDefault()
       }
     }
   }

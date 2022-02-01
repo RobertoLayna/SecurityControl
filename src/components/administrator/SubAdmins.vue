@@ -136,6 +136,7 @@
               v-model="newUser.password"
               outlined
               label="Password"
+              @keydown.space.prevent
             />
           </v-col>
           <v-col
