@@ -117,7 +117,7 @@
               class="pb-0"
             >
               <p class="h6 black--text pb-0 mb-0">
-                {{ userResidence.residence_address }}
+                {{ userResidence ? userResidence.residence_address : '' }}
               </p>
             </v-row>
             <v-row
@@ -134,7 +134,7 @@
             <v-btn
               color="primary"
               text
-              @click="/*toDelete.item = {}, */ infoDialog = false, inputCode = null"
+              @click="/*toDelete.item = {}, */ ;(infoDialog = false), (inputCode = null)"
             >
               Cerrar
             </v-btn>
@@ -178,7 +178,6 @@ export default {
     }
   },
   computed: {
-    
     validationPending() {
       return this.isValid === undefined && this.camera === 'off'
     },
@@ -272,28 +271,81 @@ export default {
 
       this.turnCameraOn()
     },
+    async validateAccess(startD, endD, startT, endT) {
+      console.log("dates", startD, endD, startT, endT)
+      const now = this.$moment()
+      if (startD && endD && startT && endT) {
+        return (
+          now > this.$moment(startD, 'YYYY-MM-DD') &&
+          now < this.$moment(endD, 'YYYY-MM-DD') &&
+          now > this.$moment(now.format('YYYY-MM-DD') + ' ' + startT, 'YYYY-MM-DD HH:mm:ss') &&
+          now < this.$moment(now.format('YYYY-MM-DD') + ' ' + endT, 'YYYY-MM-DD HH:mm:ss')
+        )
+      }
+
+      if (startD && endD && startT)
+        return (
+          now > this.$moment(startD, 'YYYY-MM-DD') &&
+          now < this.$moment(endD, 'YYYY-MM-DD') &&
+          now > this.$moment(now.format('YYYY-MM-DD') + ' ' + startT, 'YYYY-MM-DD HH:mm:ss')
+        )
+      if (startD && endD)
+        return now > this.$moment(startD, 'YYYY-MM-DD') && now < this.$moment(endD, 'YYYY-MM-DD')
+      if (startD) return now > this.$moment(startD, 'YYYY-MM-DD')
+      else return false
+    },
 
     async isValidateQr(content) {
       this.residence = await this.$axios
         .get('https://53ea886.online-server.cloud/visits/qr/' + content)
-        .then((rs) => {
+        .then(async (rs) => {
           if (rs.data.Data.length > 0) {
             this.visitor = rs.data.Data[0]
-            this.infoDialog = true
-            this.$toast.success('Codigo valido, registro guardado correctamente', {
-              position: 'bottom-center',
-              timeout: 1500,
-              closeOnClick: true,
-              pauseOnFocusLoss: true,
-              pauseOnHover: true,
-              draggable: true,
-              draggablePercent: 0.6,
-              showCloseButtonOnHover: false,
-              hideProgressBar: true,
-              closeButton: 'button',
-              icon: true,
-              rtl: false
-            })
+            console.log("validAccess", await this.validateAccess(
+                this.visitor.visit_start_date,
+                this.visitor.visit_end_date,
+                this.visitor.visit_start_time,
+                this.visitor.visit_end_time
+              ))
+            if (
+              await this.validateAccess(
+                this.visitor.visit_start_date,
+                this.visitor.visit_end_date,
+                this.visitor.visit_start_time,
+                this.visitor.visit_end_time
+              )
+            ) {
+              this.infoDialog = true
+              this.$toast.success('Codigo valido', {
+                position: 'bottom-center',
+                timeout: 1500,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: 'button',
+                icon: true,
+                rtl: false
+              })
+            } else {
+              this.$toast.error('Horario de acceso no valido', {
+                position: 'bottom-center',
+                timeout: 10000,
+                closeOnClick: true,
+                pauseOnFocusLoss: true,
+                pauseOnHover: true,
+                draggable: true,
+                draggablePercent: 0.6,
+                showCloseButtonOnHover: false,
+                hideProgressBar: true,
+                closeButton: 'button',
+                icon: true,
+                rtl: false
+              })
+            }
           } else {
             this.$toast.error('Codigo invalido', {
               position: 'bottom-center',
@@ -343,7 +395,7 @@ export default {
         })
     },
 
-    async getUserResidence(){
+    async getUserResidence() {
       this.userResidence = await this.$axios
         .get('https://53ea886.online-server.cloud/residences/' + this.userVisitor.user_residence_id)
         .then((rs) => {
