@@ -20,45 +20,55 @@
         </v-card-title>
         <v-card-text class="pa-0">
           <v-row no-gutters>
-            <v-card>
-              <v-card-title>
-                <v-text-field
-                  v-model="search"
-                  append-icon="mdi-magnify"
-                  label="Search"
-                  single-line
-                  hide-details
-                />
-              </v-card-title>
-              <v-data-table
-                :headers="headers"
-                :items="users"
-                :search="search"
-              >
-                <template #[`item.user_active`]="{ item }">
-                  <v-chip
-                    :color="item.user_active ? 'success' : 'error'"
-                    dark
-                  >
-                    {{ item.user_active ? 'Active' : 'Inactive' }}
-                  </v-chip>
-                </template>
-                <template #[`item.actions`]="{ item }">
-                  <v-btn
-                    color="red"
-                    outlined
-                    small
-                    @click="
+            <v-col cols="12">
+              <v-card>
+                <v-card-title>
+                  <v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  />
+                </v-card-title>
+                <v-data-table
+                  :headers="headers"
+                  :items="users"
+                  :search="search"
+                >
+                  <template #[`item.user_active`]="{ item }">
+                    <v-chip
+                      :color="item.user_active ? 'success' : 'error'"
+                      dark
+                    >
+                      {{ item.user_active ? 'Active' : 'Inactive' }}
+                    </v-chip>
+                  </template>
+                  <template #[`item.actions`]="{ item }">
+                    <v-btn
+                      color="red"
+                      outlined
+                      small
+                      @click="
                       ;(toDelete.dialog = true),
                         (toDelete.name = item.user_name),
                         (toDelete.id = item.user_id)
-                    "
-                  >
-                    <v-icon>mdi-trash-can</v-icon>
-                  </v-btn>
-                </template>
-              </v-data-table>
-            </v-card>
+                      "
+                    >
+                      <v-icon>mdi-trash-can</v-icon>
+                    </v-btn>
+                  </template>
+                  <template #[`item.user_residential_id`]="{ item }">
+                    <v-chip
+                      color="primary"
+                      dark
+                    >
+                      {{ $_.find(residentials, ['residential_id', item.user_residential_id]).residential_name }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </v-card>
+            </v-col>
           </v-row>
         </v-card-text>
       </v-card>
@@ -285,7 +295,7 @@ export default {
           value: 'user_complete_name'
         },
         { text: 'Phone', value: 'user_phone' },
-        { text: 'Residential', value: 'user_phone' },
+        { text: 'Residential', value: 'user_residential_id' },
         { text: 'Status', value: 'user_active' },
         { text: '', value: 'actions' }
       ],
