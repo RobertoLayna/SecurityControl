@@ -12,16 +12,14 @@
           <v-row
             no-gutters
             justify="center"
+            align="center"
           >
-            <v-col
-              cols="12"
+            <v-img
+              max-height="300"
+              max-width="300"
               class="justify-center"
-            >
-              <v-img
-                class="justify-center"
-                src="../../assets/logo.png"
-              />
-            </v-col>
+              src="../../assets/logo.png"
+            />
           </v-row>
         </v-card-text>
         <v-window v-model="step">
@@ -168,7 +166,7 @@ export default {
     async preLogin() {
       try {
         await this.$axios
-          .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/preLogin', {
+          .post('https://53ea886.online-server.cloud/app/preLogin', {
             phone: this.phone
           })
           .then((rs) => {
@@ -185,11 +183,12 @@ export default {
     async login() {
       try {
         await this.$axios
-          .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/login', {
+          .post('https://53ea886.online-server.cloud/app/login', {
             phone: this.phone,
             password: this.password
           })
           .then((rs) => {
+            if (rs.data.status == "denied") throw 'Acceso denegado. Cominicate con tu administrador'
             if (rs.data.status != "success") throw 'Password incorrecto.'
             this.$store.dispatch('setUser', rs.data.data).then(()=>{
               this.$router.push('/')
@@ -197,8 +196,20 @@ export default {
           })
       } catch (err) {
         console.log('PreLogin', err)
-        this.errorAlert = true
-        this.errorMessage = err
+        this.$toast.error(err, {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
       }
     },
     onlyNumbers(event){

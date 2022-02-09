@@ -37,6 +37,17 @@
                   {{ item.residential_name }}
                   <v-spacer />
                   <v-btn
+                    v-if="user.user_rol == 'su_admin'"
+                    icon
+                    color="primary darken-5"
+                    class="mx-3"
+                    @click="
+                      dialogUpdateName = true, editResidentialName = item.residential_name, selectedResidential = item.residential_id
+                    "
+                  >
+                    <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn
                     dark
                     color="green"
                     @click="
@@ -46,7 +57,7 @@
                       })
                     "
                   >
-                    View
+                    Ver
                   </v-btn>
                 </v-card-title>
 
@@ -97,7 +108,7 @@
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Create new</v-toolbar-title>
+          <v-toolbar-title>Crear nueva residencial/privada</v-toolbar-title>
           <v-spacer />
           <v-toolbar-items>
             <v-btn
@@ -105,7 +116,7 @@
               text
               @click="createResidential()"
             >
-              Save
+              Guardar
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
@@ -202,6 +213,49 @@
         </v-container>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="dialogUpdateName"
+      persistent
+      max-width="400"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Editar nombre residencial
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col
+              cols="12"
+            >
+              <v-text-field
+                v-model="editResidentialName"
+                label="New name"
+                outlined
+                clearable
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            color="red darken-1"
+            outlined
+            @click="dialogUpdateName = false"
+          >
+            Cancelar
+          </v-btn>
+          <v-btn
+            color="green darken-1"
+            dark
+            :disabled="editResidentialName == null || editResidentialName == ''"
+            @click="updateNameResidential()"
+          >
+            Guardar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
@@ -211,6 +265,7 @@ export default {
   data() {
     return {
       dialog: false,
+      dialogUpdateName: false,
       itemsPerPage: 10,
       residentials: [],
       newResidential: {
@@ -218,7 +273,9 @@ export default {
         location: null
       },
       itemsSelectAdmin: ['New', 'Existing'],
-      itemSelectAdmin: null
+      itemSelectAdmin: null,
+      editResidentialName: null,
+      selectedResidential: null
     }
   },
   computed: {
@@ -276,6 +333,32 @@ export default {
             rtl: false
           })
           this.dialog = false
+        })
+    },
+    async updateNameResidential() {
+      await this.$axios
+        .put('https://53ea886.online-server.cloud/residentials/' + this.selectedResidential, { residential_name: this.editResidentialName })
+        .then(async (rs) => {
+          this.selectedResidential = null
+          this.editResidentialName = null
+          this.dialogUpdateName = false
+          this.getResidentials()
+        })
+        .catch((error) => {
+          this.$toast.error(error, {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
         })
     }
   }

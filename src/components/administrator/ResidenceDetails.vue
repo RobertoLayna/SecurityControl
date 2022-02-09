@@ -19,7 +19,7 @@
           </v-btn>
 
           <v-toolbar-title>
-            {{ residential.residential_name }} / {{ residence.residence_number }} / users
+            {{ residential.residential_name }} / {{ residence.residence_number }} / usuarios
           </v-toolbar-title>
 
           <v-spacer />
@@ -34,31 +34,33 @@
       </v-card-title>
       <v-card-text class="pa-0">
         <v-row no-gutters>
-          <v-card>
-            <v-card-title>
-              <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Search"
-                single-line
-                hide-details
-              />
-            </v-card-title>
-            <v-data-table
-              :headers="headers"
-              :items="users"
-              :search="search"
-            >
-              <template #[`item.user_active`]="{ item }">
-                <v-chip
-                  :color="item.user_active ? 'success' : 'error'"
-                  dark
-                >
-                  {{ item.user_active ? 'Active' : 'Inactive' }}
-                </v-chip>
-              </template>
-            </v-data-table>
-          </v-card>
+          <v-col cols="12">
+            <v-card>
+              <v-card-title>
+                <v-text-field
+                  v-model="search"
+                  append-icon="mdi-magnify"
+                  label="Search"
+                  single-line
+                  hide-details
+                />
+              </v-card-title>
+              <v-data-table
+                :headers="headers"
+                :items="users"
+                :search="search"
+              >
+                <template #[`item.user_active`]="{ item }">
+                  <v-chip
+                    :color="item.user_active ? 'success' : 'error'"
+                    dark
+                  >
+                    {{ item.user_active ? 'Active' : 'Inactive' }}
+                  </v-chip>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -80,7 +82,7 @@
           >
             <v-icon>mdi-close</v-icon>
           </v-btn>
-          <v-toolbar-title>Create new</v-toolbar-title>
+          <v-toolbar-title>Nuevo usuario para esta casa</v-toolbar-title>
           <v-spacer />
           <v-toolbar-items>
             <v-btn
@@ -88,7 +90,7 @@
               text
               @click="createUser()"
             >
-              Save
+              Guardar
             </v-btn>
           </v-toolbar-items>
         </v-toolbar>
@@ -100,10 +102,10 @@
             <v-text-field
               v-model.number="newUser.name"
               outlined
-              label="Full name"
+              label="Nombre"
             />
           </v-col>
-          <v-col
+          <!--v-col
             class="d-flex"
             cols="12"
           >
@@ -111,6 +113,16 @@
               v-model="newUser.username"
               outlined
               label="Username"
+            />
+          </v-col-->
+          <v-col
+            class="d-flex"
+            cols="12"
+          >
+            <v-text-field
+              v-model="newUser.phone"
+              outlined
+              label="Phone"
             />
           </v-col>
           <v-col
@@ -123,16 +135,7 @@
               label="Password"
             />
           </v-col>
-          <v-col
-            class="d-flex"
-            cols="12"
-          >
-            <v-text-field
-              v-model="newUser.phone"
-              outlined
-              label="Phone"
-            />
-          </v-col>
+
           <!--v-col
             class="d-flex"
             cols="12"
@@ -252,7 +255,7 @@ export default {
   methods: {
     async getUsers() {
       this.users = await this.$axios
-        .get('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users')
+        .get('https://53ea886.online-server.cloud/users')
         .then((rs) => {
           console.log(
             this.$_.filter(rs.data.Data, {
@@ -272,10 +275,10 @@ export default {
     },
     async createUser() {
       await this.$axios
-        .post('https://us-central1-securitycontrol-nopalnet.cloudfunctions.net/api/users', {
+        .post('https://53ea886.online-server.cloud/users', {
           user_residence_id: this.residence.residence_id,
           user_complete_name: this.newUser.name,
-          user_name: this.newUser.username,
+          user_name: '-', //this.newUser.username,
           user_password: this.newUser.password,
           user_phone: this.newUser.phone,
           user_rol: 'resident',

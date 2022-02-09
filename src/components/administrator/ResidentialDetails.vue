@@ -19,7 +19,7 @@
               <v-icon>mdi-arrow-left</v-icon>
             </v-btn>
 
-            <v-toolbar-title>{{ residential.residential_name }} / Residences</v-toolbar-title>
+            <v-toolbar-title>{{ residential.residential_name }} / Casas</v-toolbar-title>
 
             <v-spacer />
             <v-btn
@@ -45,138 +45,154 @@
       </v-card-title>
       <v-card-text class="pa-0">
         <v-row no-gutters>
-          <v-data-iterator
-            :items="residences"
-            :items-per-page.sync="itemsPerPage"
-            :search="search"
-            :sort-by="sortBy.toLowerCase()"
-            :sort-desc="sortDesc"
-          >
-            <template v-slot:header>
-              <v-toolbar
-                dark
-                color="primary darken-3"
-                class="mb-1"
-              >
-                <v-text-field
-                  v-model="search"
-                  clearable
-                  flat
-                  solo-inverted
-                  hide-details
-                  prepend-inner-icon="mdi-magnify"
-                  label="Search"
-                />
-                <v-spacer />
-                <template v-if="$vuetify.breakpoint.mdAndUp">
-                  <v-spacer />
-                  <v-select
-                    v-model="sortBy"
+          <v-col cols="12">
+            <v-data-iterator
+              :items="residences"
+              :items-per-page.sync="itemsPerPage"
+              :search="search"
+              :sort-by="sortBy.toLowerCase()"
+              :sort-desc="sortDesc"
+            >
+              <template v-slot:header>
+                <v-toolbar
+                  dark
+                  color="primary darken-3"
+                  class="mb-1"
+                >
+                  <v-text-field
+                    v-model="search"
+                    clearable
                     flat
                     solo-inverted
                     hide-details
-                    :items="keys"
                     prepend-inner-icon="mdi-magnify"
-                    label="Sort by"
+                    label="Search"
                   />
                   <v-spacer />
-                  <v-btn-toggle
-                    v-model="sortDesc"
-                    mandatory
-                  >
-                    <v-btn
-                      large
-                      depressed
-                      color="primary"
-                      :value="false"
+                  <template v-if="$vuetify.breakpoint.mdAndUp">
+                    <v-spacer />
+                    <v-select
+                      v-model="sortBy"
+                      flat
+                      solo-inverted
+                      hide-details
+                      :items="keys"
+                      prepend-inner-icon="mdi-magnify"
+                      label="Sort by"
+                    />
+                    <v-spacer />
+                    <v-btn-toggle
+                      v-model="sortDesc"
+                      mandatory
                     >
-                      <v-icon>mdi-arrow-up</v-icon>
-                    </v-btn>
-                    <v-btn
-                      large
-                      depressed
-                      color="primary"
-                      :value="true"
-                    >
-                      <v-icon>mdi-arrow-down</v-icon>
-                    </v-btn>
-                  </v-btn-toggle>
-                </template>
-              </v-toolbar>
-            </template>
+                      <v-btn
+                        large
+                        depressed
+                        color="primary"
+                        :value="false"
+                      >
+                        <v-icon>mdi-arrow-up</v-icon>
+                      </v-btn>
+                      <v-btn
+                        large
+                        depressed
+                        color="primary"
+                        :value="true"
+                      >
+                        <v-icon>mdi-arrow-down</v-icon>
+                      </v-btn>
+                    </v-btn-toggle>
+                  </template>
+                </v-toolbar>
+              </template>
 
-            <template v-slot:default="props">
-              <v-row
-                v-for="item in props.items"
-                :key="item.name"
-                no-gutters
-              >
-                <v-col cols="12">
-                  <v-container>
-                    <v-card>
-                      <v-card-title class="subheading font-weight-bold">
-                        <v-row no-gutters>
-                          <v-chip
-                            :color="item.residence_active ? 'success' : 'error'"
-                            dark
+              <template v-slot:default="props">
+                <v-row
+                  v-for="item in props.items"
+                  :key="item.name"
+                  no-gutters
+                >
+                  <v-col cols="12">
+                    <v-container>
+                      <v-card>
+                        <v-card-title class="subheading font-weight-bold">
+                          <v-row no-gutters>
+                            <v-chip
+                              :color="item.residence_active ? 'success' : 'error'"
+                              dark
+                            >
+                              {{ item.residence_active ? 'Activa' : 'Morosa' }}
+                            </v-chip>
+                            {{ item.residence_number }}
+                          </v-row>
+                          <v-spacer />
+                          <v-btn
+                            icon
+                            color="primary darken-5"
+                            class="mx-3"
+                            @click="
+                              ;(HouseToUpdate = {
+                                id: item.residence_id,
+                                name: item.residence_number,
+                                address: item.residence_address
+                              }),
+                                (dialogUpdateRecidence = true)
+                            "
                           >
-                            {{ item.residence_active ? 'Active' : 'Inactive' }}
-                          </v-chip>
-                          {{ item.residence_number }}
-                        </v-row>
-                        <v-spacer />
-                        <v-btn
-                          icon
-                          color="primary"
-                          @click="
-                            $router.push({
-                              name: 'AdministratorResidenceDetails',
-                              params: {
-                                id: item.residence_residential_id,
-                                residential: residential,
-                                residence: item
-                              }
-                            })
-                          "
-                        >
-                          <v-icon>mdi-cog</v-icon>
-                        </v-btn>
-                      </v-card-title><v-card-subtitle>
-                        {{ item.residence_address }}
-                      </v-card-subtitle>
+                            <v-icon>mdi-pencil</v-icon>
+                          </v-btn>
+                          <v-btn
+                            icon
+                            color="primary"
+                            @click="
+                              $router.push({
+                                name: 'AdministratorResidenceDetails',
+                                params: {
+                                  id: item.residence_residential_id,
+                                  residential: residential,
+                                  residence: item
+                                }
+                              })
+                            "
+                          >
+                            <v-icon>mdi-cog</v-icon>
+                          </v-btn>
+                        </v-card-title><v-card-subtitle>
+                          {{ item.residence_address }}
+                        </v-card-subtitle>
 
-                      <v-divider />
-                      <v-card-actions>
-                        <v-btn
-                          v-if="item.residence_active"
-                          outlined
-                          color="error"
-                          @click="setActive(item.residence_id, !item.residence_active)"
-                        >
-                          Desactivar
-                        </v-btn>
-                        <v-btn
-                          v-else
-                          outlined
-                          color="success"
-                          @click="setActive(item.residence_id, !item.residence_active)"
-                        >
-                          Activar
-                        </v-btn>
-                        <v-spacer />
-                        <v-btn
-                          outlined
-                          color="error"
-                          @click="
-                            ;(dialogDeleteHouse = true),
-                              (HouseToDelete.name = item.residence_number),
-                              (HouseToDelete.id = item.residence_id)
-                          "
-                        >
-                          Borrar casa
-                        </v-btn>
-                      </v-card-actions>
-                      <!--v-list dense>
+                        <v-divider />
+                        <v-card-actions>
+                          <v-btn
+                            v-if="item.residence_active"
+                            outlined
+                            color="error"
+                            @click="setActive(item.residence_id, !item.residence_active)"
+                          >
+                            Desactivar
+                          </v-btn>
+                          <v-btn
+                            v-else
+                            outlined
+                            color="success"
+                            @click="setActive(item.residence_id, !item.residence_active)"
+                          >
+                            Activar
+                          </v-btn>
+                          <v-spacer />
+                          <v-btn
+                            outlined
+                            color="error"
+                            @click="
+                              ;(dialogDeleteHouse = true),
+                                (HouseToDelete.name = item.residence_number),
+                                (HouseToDelete.id = item.residence_id)
+                            "
+                          >
+                            Borrar casa
+                          </v-btn>
+                        </v-card-actions>
+                        <!--v-list dense>
                     <v-list-item>
                       <v-list-item-content>Residents:</v-list-item-content>
                       <v-list-item-content class="align-end">
@@ -184,13 +200,13 @@
                       </v-list-item-content>
                     </v-list-item>
                   </v-list-->
-                    </v-card>
-                  </v-container>
-                </v-col>
-              </v-row>
-            </template>
+                      </v-card>
+                    </v-container>
+                  </v-col>
+                </v-row>
+              </template>
 
-            <!--template v-slot:footer>
+              <!--template v-slot:footer>
             <v-toolbar
               class="mt-2"
               color="primary darken-5"
@@ -202,7 +218,8 @@
               </v-toolbar-title>
             </v-toolbar>
           </template-->
-          </v-data-iterator>
+            </v-data-iterator>
+          </v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -226,7 +243,7 @@
               >
                 <v-icon>mdi-close</v-icon>
               </v-btn>
-              <v-toolbar-title>Create new</v-toolbar-title>
+              <v-toolbar-title>Crear nueva casa</v-toolbar-title>
               <v-spacer />
               <v-toolbar-items>
                 <v-btn
@@ -234,7 +251,7 @@
                   text
                   @click="createResidence()"
                 >
-                  Save
+                  Guardar
                 </v-btn>
               </v-toolbar-items>
             </v-toolbar>
@@ -244,9 +261,9 @@
                 cols="12"
               >
                 <v-text-field
-                  v-model.number="newResidence.number"
+                  v-model="newResidence.number"
                   outlined
-                  label="Number"
+                  label="Identificador"
                 />
               </v-col>
               <v-col
@@ -256,7 +273,7 @@
                 <v-text-field
                   v-model="newResidence.address"
                   outlined
-                  label="Address"
+                  label="Direccion"
                 />
               </v-col>
               <!--v-col
@@ -334,38 +351,60 @@
         </v-dialog>
       </v-col>
     </v-row>
-    <v-row
-      no-gutters
-      justify="center"
-    >
+    <v-row no-gutters>
       <v-col cols="12">
         <v-dialog
-          v-model="dialogDelete"
-          persistent
-          max-width="290"
+          v-model="dialogUpdateRecidence"
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
         >
           <v-card>
-            <v-card-title class="text-h5">
-              {{ residentialToDelete.name }}
-            </v-card-title>
-            <v-card-text>Borrar definitivamente esta residencial?</v-card-text>
-            <v-card-actions>
+            <v-toolbar
+              dark
+              color="primary"
+            >
+              <v-btn
+                icon
+                dark
+                @click="dialogUpdateRecidence = false"
+              >
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+              <v-toolbar-title>Editar casa</v-toolbar-title>
               <v-spacer />
-              <v-btn
-                color="error"
-                text
-                @click="dialogDelete = false"
+              <v-toolbar-items>
+                <v-btn
+                  dark
+                  text
+                  @click="updateHouse()"
+                >
+                  Guardar
+                </v-btn>
+              </v-toolbar-items>
+            </v-toolbar>
+            <v-container>
+              <v-col
+                class="d-flex"
+                cols="12"
               >
-                Cancelar
-              </v-btn>
-              <v-btn
-                color="success"
-                text
-                @click="deleteItem()"
+                <v-text-field
+                  v-model="HouseToUpdate.name"
+                  outlined
+                  label="Identificador"
+                />
+              </v-col>
+              <v-col
+                class="d-flex"
+                cols="12"
               >
-                Si
-              </v-btn>
-            </v-card-actions>
+                <v-text-field
+                  v-model="HouseToUpdate.address"
+                  outlined
+                  label="Direccion"
+                />
+              </v-col>
+            </v-container>
           </v-card>
         </v-dialog>
       </v-col>
@@ -471,10 +510,16 @@ export default {
         id: null,
         name: null
       },
+      HouseToUpdate: {
+        id: null,
+        name: null,
+        address: null
+      },
       residentialToDelete: {
         id: null,
         name: null
-      }
+      },
+      dialogUpdateRecidence: false
     }
   },
   computed: {
@@ -592,6 +637,34 @@ export default {
       await this.$axios
         .put('https://53ea886.online-server.cloud/residences/' + id, { residence_active: status })
         .then(async (rs) => {
+          this.getResidences()
+        })
+        .catch((error) => {
+          this.$toast.error(error, {
+            position: 'bottom-center',
+            timeout: 5000,
+            closeOnClick: true,
+            pauseOnFocusLoss: true,
+            pauseOnHover: true,
+            draggable: true,
+            draggablePercent: 0.6,
+            showCloseButtonOnHover: false,
+            hideProgressBar: true,
+            closeButton: 'button',
+            icon: true,
+            rtl: false
+          })
+        })
+    },
+    async updateHouse() {
+      await this.$axios
+        .put('https://53ea886.online-server.cloud/residences/' + this.HouseToUpdate.id, { residence_number: this.HouseToUpdate.name, residence_address: this.HouseToUpdate.address })
+        .then(async (rs) => {
+          console.log(rs)
+          this.HouseToUpdate.id = null
+          this.HouseToUpdate.name = null
+          this.HouseToUpdate.address = null
+          this.dialogUpdateRecidence = false
           this.getResidences()
         })
         .catch((error) => {
