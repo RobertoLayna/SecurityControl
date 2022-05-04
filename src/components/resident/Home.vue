@@ -133,6 +133,7 @@ export default {
         })
     },
     async updatePassword() {
+      try {
       this.userUpdate = await this.$axios
         .post('https://53ea886.online-server.cloud/app/updatePassword', {
           id: this.user.user_id,
@@ -140,14 +141,15 @@ export default {
           newPass: this.newPass
         })
         .then((rs) => {
+          
+          if (rs.data.status != "success") throw 'Verifique que los datos sean correctos'
           this.dialog = false
-
           this.$store.dispatch('logout').then(() => {
             this.$router.push({ name: 'Login' })
           })
         })
-        .catch((error) => {
-          console.log('PreLogin', err)
+      } catch (err) {
+         console.log('PreLogin', err)
           this.$toast.error(err, {
             position: 'bottom-center',
             timeout: 5000,
@@ -162,7 +164,7 @@ export default {
             icon: true,
             rtl: false
           })
-        })
+      }
     }
   }
 }
