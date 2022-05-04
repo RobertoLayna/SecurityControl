@@ -40,9 +40,7 @@
         </v-toolbar>
         <v-card-text>
           <v-row class="pt-3">
-            <v-col
-              cols="12"
-            >
+            <v-col cols="12">
               <v-text-field
                 v-model="olderPass"
                 label="Contraseña actual"
@@ -52,9 +50,7 @@
               />
             </v-col>
           </v-row><v-row class="pt-3">
-            <v-col
-              cols="12"
-            >
+            <v-col cols="12">
               <v-text-field
                 v-model="newPass"
                 label="Nueva contraseña"
@@ -94,10 +90,10 @@ export default {
       residence: {},
       residential: {},
       olderPass: null,
-      newPass: null,
+      newPass: null
     }
   },
-  
+
   computed: {
     ...mapGetters({ user: 'user' })
   },
@@ -105,20 +101,17 @@ export default {
     async user() {
       await this.getResidence()
     },
-    async residence(){
-        await this.getResidential()
+    async residence() {
+      await this.getResidential()
     }
   },
   async mounted() {
-      await this.getResidence()
+    await this.getResidence()
   },
   methods: {
     async getResidence() {
       this.residence = await this.$axios
-        .get(
-          'https://53ea886.online-server.cloud/residences/' +
-            this.user.user_residence_id
-        )
+        .get('https://53ea886.online-server.cloud/residences/' + this.user.user_residence_id)
         .then((rs) => {
           return rs.data.Data
         })
@@ -141,24 +134,21 @@ export default {
     },
     async updatePassword() {
       this.userUpdate = await this.$axios
-        .post(
-          'https://53ea886.online-server.cloud/app/updatePassword', {
-            id: this.user.user_id,
-            olderPass: this.olderPass,
-            newPass: this.newPass
-          }
-        )
+        .post('https://53ea886.online-server.cloud/app/updatePassword', {
+          id: this.user.user_id,
+          olderPass: this.olderPass,
+          newPass: this.newPass
+        })
         .then((rs) => {
           this.dialog = false
-          
-      this.$store.dispatch('logout').then(()=>{
-        this.$router.push({name: "Login"})
-      })
-    
+
+          this.$store.dispatch('logout').then(() => {
+            this.$router.push({ name: 'Login' })
+          })
         })
         .catch((error) => {
           console.log('PreLogin', err)
-        this.$toast.error(err, {
+          this.$toast.error(err, {
             position: 'bottom-center',
             timeout: 5000,
             closeOnClick: true,
