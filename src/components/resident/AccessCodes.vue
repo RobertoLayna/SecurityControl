@@ -545,7 +545,7 @@ export default {
   methods: {
     async getCodes() {
       this.visits = await this.$axios
-        .get('https://53ea886.online-server.cloud/visits')
+        .get('https://53ea886.online-server.cloud/visits/user/'+this.user.user_id)
         .then((rs) => {
           return rs.data.Data
         })
