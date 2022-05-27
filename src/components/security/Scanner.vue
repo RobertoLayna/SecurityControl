@@ -274,24 +274,25 @@ export default {
     async validateAccess(startD, endD, startT, endT) {
       console.log("dates", startD, endD, startT, endT)
       const now = this.$moment()
+      console.log(now <= this.$moment(endD, 'YYYY-MM-DD'))
       if (startD && endD && startT && endT) {
         return (
-          now > this.$moment(startD, 'YYYY-MM-DD') &&
-          now < this.$moment(endD, 'YYYY-MM-DD') &&
-          now > this.$moment(now.format('YYYY-MM-DD') + ' ' + startT, 'YYYY-MM-DD HH:mm:ss') &&
-          now < this.$moment(now.format('YYYY-MM-DD') + ' ' + endT, 'YYYY-MM-DD HH:mm:ss')
+          now >= this.$moment(startD+ ' ' + startT, 'YYYY-MM-DD HH:mm:ss') &&
+          now <= this.$moment(endD+ ' ' + endT, 'YYYY-MM-DD HH:mm:ss') &&
+          now >= this.$moment(now.format('YYYY-MM-DD') + ' ' + startT, 'YYYY-MM-DD HH:mm:ss') &&
+          now <= this.$moment(now.format('YYYY-MM-DD') + ' ' + endT, 'YYYY-MM-DD HH:mm:ss')
         )
       }
 
       if (startD && endD && startT)
         return (
-          now > this.$moment(startD, 'YYYY-MM-DD') &&
-          now < this.$moment(endD, 'YYYY-MM-DD') &&
-          now > this.$moment(now.format('YYYY-MM-DD') + ' ' + startT, 'YYYY-MM-DD HH:mm:ss')
+          now >= this.$moment(startD+ ' ' + startT, 'YYYY-MM-DD HH:mm:ss') &&
+          now <= this.$moment(endD+ ' 23:59:59', 'YYYY-MM-DD') &&
+          now >= this.$moment(now.format('YYYY-MM-DD') + ' ' + startT, 'YYYY-MM-DD HH:mm:ss')
         )
       if (startD && endD)
-        return now > this.$moment(startD, 'YYYY-MM-DD') && now < this.$moment(endD, 'YYYY-MM-DD')
-      if (startD) return now > this.$moment(startD, 'YYYY-MM-DD')
+        return now >= this.$moment(startD+ ' 00:00:00', 'YYYY-MM-DD') && now <= this.$moment(endD+ ' 23:59:59', 'YYYY-MM-DD')
+      if (startD) return now >= this.$moment(startD, 'YYYY-MM-DD')
       else return false
     },
 
